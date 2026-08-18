@@ -86,6 +86,9 @@ export default function DashboardPage() {
         <ZoomCard />
       </div>
 
+      {/* Dream Declaration — sits above vision tools */}
+      <DreamDeclaration declaration={declaration} onSave={setDeclaration} />
+
       {/* My Vision Section */}
       <section>
         <div className="flex items-center justify-between mb-4">
@@ -107,7 +110,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Vision Input */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-4">
           <input
             type="text"
             value={visionPrompt}
@@ -144,13 +147,8 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Dream Declaration */}
-        <DreamDeclaration declaration={declaration} onSave={setDeclaration} />
-
         {/* Vision Grid — shows real user images */}
-        <div className="mt-6">
-          <VisionGrid refreshKey={gridRefreshKey} />
-        </div>
+        <VisionGrid refreshKey={gridRefreshKey} />
       </section>
 
       {/* Notes Preview */}
