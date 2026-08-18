@@ -398,7 +398,8 @@ export default function LandingPage() {
               <img
                 src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Zoom-Logo.png"
                 alt="Zoom"
-                className="h-9 w-auto mb-8 mx-auto lg:mx-0 brightness-0 invert object-contain"
+                className="w-auto mb-8 mx-auto lg:mx-0 brightness-0 invert object-contain"
+                style={{ height: "72px" }}
               />
 
               <p className="text-xs font-semibold tracking-widest uppercase text-white/60 mb-3">Monthly Live Call</p>
