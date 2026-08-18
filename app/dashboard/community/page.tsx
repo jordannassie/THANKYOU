@@ -4,14 +4,17 @@ import { CommunityFeed } from "@/components/community/CommunityFeed";
 
 export default function CommunityPage() {
   return (
-    <div className="max-w-[680px] mx-auto">
+    <div className="max-w-[680px] mx-auto pb-16">
       {/* Header */}
-      <div className="px-4 pt-2 pb-4 border-b border-gray-100">
-        <h1 className="text-xl font-bold tracking-tight">Community</h1>
+      <div className="px-5 pt-4 pb-3">
+        <h1 className="text-xl font-bold tracking-tight text-gray-900">Community</h1>
         <p className="text-sm text-gray-500 mt-0.5">Believe together. Grow together.</p>
       </div>
 
-      {/* Feed */}
+      {/* Thin separator */}
+      <div className="border-t border-gray-200" />
+
+      {/* Feed (composer + posts) */}
       <CommunityFeed />
     </div>
   );

@@ -32,53 +32,45 @@ export function CommunityPostCard({
   const [repliesOpen, setRepliesOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const isAuthor = userId === post.user_id;
+  const isAuthor   = userId === post.user_id;
   const replyCount = post.community_comments.length;
   const authorName = getFirstName(post.profiles);
-
-  const handleDeletePost = () => {
-    if (confirmDelete) {
-      onDeletePost(post.id);
-    } else {
-      setConfirmDelete(true);
-    }
-  };
+  const fullName   = post.profiles?.full_name ?? authorName;
 
   return (
-    <article className="border-b border-gray-100 px-4 py-4 hover:bg-gray-50/50 transition-colors">
+    <article className="border-b border-gray-200 px-5 py-4 hover:bg-gray-50/40 transition-colors">
       <div className="flex gap-3">
-        {/* Avatar column */}
-        <div className="flex flex-col items-center">
+        {/* Avatar column with optional thread line */}
+        <div className="flex flex-col items-center shrink-0">
           <AvatarBubble profile={post.profiles} size="lg" />
           {repliesOpen && replyCount > 0 && (
-            <div className="w-px flex-1 bg-gray-100 mt-1" />
+            <div className="w-px flex-1 bg-gray-200 mt-1.5 mb-0.5" />
           )}
         </div>
 
         {/* Content column */}
         <div className="flex-1 min-w-0">
-          {/* Header */}
+          {/* Header: name · timestamp · delete */}
           <div className="flex items-start justify-between gap-2">
-            <div className="flex items-baseline gap-1.5 flex-wrap">
-              <span className="text-sm font-semibold text-gray-900">{authorName}</span>
-              {post.profiles?.full_name && post.profiles.full_name !== authorName && (
-                <span className="text-xs text-gray-400 truncate max-w-[120px]">
-                  {post.profiles.full_name}
-                </span>
-              )}
+            <div className="flex items-baseline gap-1.5 flex-wrap min-w-0">
+              <span className="text-sm font-bold text-gray-900 leading-tight">
+                {fullName}
+              </span>
               <span className="text-xs text-gray-400">·</span>
-              <span className="text-xs text-gray-400">{timeAgo(post.created_at)}</span>
+              <span className="text-xs text-gray-400 shrink-0">
+                {timeAgo(post.created_at)}
+              </span>
             </div>
 
-            {/* Author actions */}
+            {/* Author delete control */}
             {isAuthor && (
-              <div className="shrink-0">
+              <div className="shrink-0 mt-0.5">
                 {confirmDelete ? (
-                  <div className="flex items-center gap-2 text-xs">
+                  <span className="flex items-center gap-2 text-xs">
                     <span className="text-red-500 font-medium">Delete?</span>
                     <button
-                      onClick={handleDeletePost}
-                      className="text-red-500 hover:text-red-700 font-medium"
+                      onClick={() => onDeletePost(post.id)}
+                      className="text-red-500 hover:text-red-700 font-semibold"
                     >
                       Yes
                     </button>
@@ -88,11 +80,11 @@ export function CommunityPostCard({
                     >
                       No
                     </button>
-                  </div>
+                  </span>
                 ) : (
                   <button
                     onClick={() => setConfirmDelete(true)}
-                    className="text-gray-200 hover:text-red-400 transition-colors"
+                    className="text-gray-300 hover:text-red-400 transition-colors"
                     title="Delete post"
                   >
                     <Trash2 size={14} />
@@ -102,22 +94,22 @@ export function CommunityPostCard({
             )}
           </div>
 
-          {/* Post text */}
+          {/* Post body */}
           <p className="text-sm text-gray-800 mt-1.5 leading-relaxed break-words whitespace-pre-wrap">
             {post.content}
           </p>
 
-          {/* Reaction bar */}
+          {/* Actions */}
           <ReactionBar
             reactions={post.community_reactions}
             userId={userId}
             replyCount={replyCount}
-            isAuthor={false} // delete handled above
+            isAuthor={false}
             onReact={(type) => onReactPost(post.id, type)}
             onReplyClick={() => setRepliesOpen((v) => !v)}
           />
 
-          {/* Reply toggle indicator */}
+          {/* Reply count hint when collapsed */}
           {replyCount > 0 && !repliesOpen && (
             <button
               onClick={() => setRepliesOpen(true)}

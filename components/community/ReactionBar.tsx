@@ -29,17 +29,15 @@ export function ReactionBar({
   const myHeart     = userId ? hasReacted(reactions, userId, "heart")     : false;
 
   return (
-    <div className="flex items-center gap-4 mt-3">
+    <div className="flex items-center gap-5 mt-3">
       {/* Reply */}
       {onReplyClick !== undefined && (
         <button
           onClick={onReplyClick}
-          className="flex items-center gap-1 text-gray-400 hover:text-blue-500 transition-colors text-xs"
+          className="flex items-center gap-1.5 text-gray-500 hover:text-blue-500 transition-colors text-xs font-medium"
         >
-          <MessageCircle size={14} />
-          {replyCount !== undefined && replyCount > 0 && (
-            <span>{replyCount}</span>
-          )}
+          <MessageCircle size={15} />
+          {replyCount !== undefined && replyCount > 0 && <span>{replyCount}</span>}
         </button>
       )}
 
@@ -47,14 +45,13 @@ export function ReactionBar({
       <button
         onClick={() => userId && onReact("thumbs_up")}
         disabled={!userId}
-        className={`flex items-center gap-1 text-xs transition-colors disabled:cursor-default ${
-          myThumb ? "text-black font-semibold" : "text-gray-400 hover:text-black"
+        className={`flex items-center gap-1.5 text-xs font-medium transition-colors disabled:cursor-default ${
+          myThumb
+            ? "text-gray-900"
+            : "text-gray-500 hover:text-gray-900"
         }`}
       >
-        <ThumbsUp
-          size={14}
-          className={myThumb ? "fill-black" : ""}
-        />
+        <ThumbsUp size={15} fill={myThumb ? "currentColor" : "none"} />
         {thumbsCount > 0 && <span>{thumbsCount}</span>}
       </button>
 
@@ -62,14 +59,13 @@ export function ReactionBar({
       <button
         onClick={() => userId && onReact("heart")}
         disabled={!userId}
-        className={`flex items-center gap-1 text-xs transition-colors disabled:cursor-default ${
-          myHeart ? "text-rose-500 font-semibold" : "text-gray-400 hover:text-rose-500"
+        className={`flex items-center gap-1.5 text-xs font-medium transition-colors disabled:cursor-default ${
+          myHeart
+            ? "text-rose-500"
+            : "text-gray-500 hover:text-rose-500"
         }`}
       >
-        <Heart
-          size={14}
-          className={myHeart ? "fill-rose-500" : ""}
-        />
+        <Heart size={15} fill={myHeart ? "currentColor" : "none"} />
         {heartCount > 0 && <span>{heartCount}</span>}
       </button>
 
@@ -77,10 +73,10 @@ export function ReactionBar({
       {isAuthor && onDelete && (
         <button
           onClick={onDelete}
-          className="ml-auto text-gray-300 hover:text-red-500 transition-colors"
+          className="ml-auto text-gray-300 hover:text-red-400 transition-colors"
           title="Delete"
         >
-          <Trash2 size={13} />
+          <Trash2 size={14} />
         </button>
       )}
     </div>

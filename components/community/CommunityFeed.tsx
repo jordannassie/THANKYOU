@@ -344,8 +344,8 @@ export function CommunityFeed() {
       )}
 
       {isDemo && (
-        <div className="px-4 py-4 border-b border-gray-100 bg-gray-50 text-sm text-gray-500">
-          <strong className="text-black">Demo mode</strong> — Sign in to post and interact.
+        <div className="mx-4 my-4 px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm text-gray-500">
+          <strong className="text-black">Demo mode</strong> — Sign in to post and interact with the community.
         </div>
       )}
 
