@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowRight,
   CheckCircle,
@@ -23,6 +23,9 @@ import {
   BOOK_AMAZON_URL,
   MEMBERSHIP_PRICE,
   MEMBERSHIP_FEATURES,
+  NEXT_ZOOM_CALL_DATE,
+  NEXT_ZOOM_CALL_TITLE,
+  NEXT_ZOOM_CALL_URL,
 } from "@/lib/site-config";
 
 const features = [
@@ -34,8 +37,33 @@ const features = [
   { icon: Video, title: "Monthly Calls", description: "Join live encouragement, teaching, and accountability." },
 ];
 
+function useCountdown(target: Date) {
+  const [time, setTime] = useState({ days: 0, hours: 0, mins: 0, secs: 0, live: false });
+
+  useEffect(() => {
+    function tick() {
+      const diff = target.getTime() - Date.now();
+      if (diff <= 0) {
+        setTime({ days: 0, hours: 0, mins: 0, secs: 0, live: true });
+        return;
+      }
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      setTime({ days, hours, mins, secs, live: false });
+    }
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [target]);
+
+  return time;
+}
+
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const countdown = useCountdown(NEXT_ZOOM_CALL_DATE);
 
   return (
     <div className="min-h-screen bg-white">
@@ -355,6 +383,65 @@ export default function LandingPage() {
           >
             Join Thank You.
           </Link>
+        </div>
+      </section>
+
+      {/* Live Call Countdown */}
+      <section className="py-24 px-5 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Zoom logo */}
+          <img
+            src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Zoom-Logo.png"
+            alt="Zoom"
+            className="h-10 w-auto mx-auto mb-8 object-contain"
+          />
+
+          <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-4">Monthly Live Call</p>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">{NEXT_ZOOM_CALL_TITLE}</h2>
+          <p className="text-gray-400 text-sm mb-12">
+            {NEXT_ZOOM_CALL_DATE.toLocaleDateString("en-US", {
+              weekday: "long", month: "long", day: "numeric", year: "numeric",
+            })}
+            {" · "}
+            {NEXT_ZOOM_CALL_DATE.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short" })}
+          </p>
+
+          {/* Big countdown */}
+          {countdown.live ? (
+            <p className="text-4xl md:text-5xl font-bold tracking-tight text-black">Live Now</p>
+          ) : (
+            <div className="flex items-start justify-center gap-4 md:gap-8">
+              {[
+                { value: countdown.days, label: "DAYS" },
+                { value: countdown.hours, label: "HRS" },
+                { value: countdown.mins, label: "MINS" },
+                { value: countdown.secs, label: "SECS" },
+              ].map(({ value, label }, i) => (
+                <div key={label} className="flex items-start gap-4 md:gap-8">
+                  <div className="text-center">
+                    <p className="text-5xl md:text-7xl font-bold tabular-nums leading-none">
+                      {String(value).padStart(2, "0")}
+                    </p>
+                    <p className="text-xs font-semibold tracking-widest text-gray-400 mt-2">{label}</p>
+                  </div>
+                  {i < 3 && (
+                    <p className="text-4xl md:text-6xl font-light text-gray-200 leading-none mt-1">:</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <a
+            href={NEXT_ZOOM_CALL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-12 bg-black text-white font-medium px-8 py-4 rounded-xl hover:bg-gray-900 transition-colors text-sm"
+          >
+            Join to Attend
+            <ArrowRight size={15} />
+          </a>
+          <p className="text-xs text-gray-400 mt-3">Members only — <Link href="/login" className="underline hover:text-black transition-colors">Join Thank You.</Link> to access live calls.</p>
         </div>
       </section>
 
