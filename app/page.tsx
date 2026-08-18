@@ -277,18 +277,12 @@ export default function LandingPage() {
             {/* Book Cover */}
             <div className="flex justify-center md:justify-end">
               <div className="relative">
-                <div className="w-56 h-72 md:w-64 md:h-80 bg-black rounded-2xl shadow-2xl shadow-gray-400/30 flex flex-col items-center justify-center p-8">
-                  <p className="text-white/30 text-xs tracking-[0.3em] uppercase mb-4">Thank You.</p>
-                  <div className="w-full h-px bg-white/20 mb-6" />
-                  <BookMarked size={32} className="text-white/50 mb-4" />
-                  <p className="font-serif text-white text-xl font-medium text-center leading-snug">
-                    365<br />Thank You.
-                  </p>
-                  <div className="w-full h-px bg-white/20 mt-6 mb-3" />
-                  <p className="text-white/30 text-[10px] tracking-widest uppercase">{BOOK_PRICE}</p>
-                </div>
-                {/* Subtle shadow/depth */}
-                <div className="absolute -bottom-2 -right-2 w-56 md:w-64 h-72 md:h-80 bg-gray-200 rounded-2xl -z-10" />
+                <img
+                  src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Booksmall.png"
+                  alt="365 Thank You. by Jordan Nassie"
+                  className="w-56 md:w-64 rounded-2xl shadow-2xl shadow-gray-400/30 object-cover"
+                />
+                <div className="absolute -bottom-2 -right-2 w-56 md:w-64 h-full bg-gray-200 rounded-2xl -z-10" />
               </div>
             </div>
 
@@ -307,10 +301,14 @@ export default function LandingPage() {
                 href={BOOK_AMAZON_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-black text-white font-medium px-7 py-4 rounded-xl hover:bg-gray-900 transition-colors text-sm"
+                className="inline-flex items-center gap-3 bg-black text-white font-medium px-7 py-4 rounded-xl hover:bg-gray-900 transition-colors text-sm"
               >
+                <img
+                  src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Amazon_logo.svg.webp"
+                  alt="Amazon"
+                  className="h-4 w-auto brightness-0 invert"
+                />
                 Get the Book on Amazon
-                <ArrowRight size={15} />
               </a>
 
               <p className="text-sm text-gray-400 mt-5 leading-relaxed">
