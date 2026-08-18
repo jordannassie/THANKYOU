@@ -228,9 +228,9 @@ export default function LandingPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { step: "01", title: "Receive", desc: "Receive the promise God has placed in your heart and begin to see your future through faith." },
-              { step: "02", title: "Believe", desc: "Believe before you see it. Hold onto God's Word, guard what you speak, and keep walking in faith." },
-              { step: "03", title: "Thank", desc: "Thank God now for what you are believing Him for — before the answer appears." },
+              { step: "01", title: "Receive It", desc: "See the future you are believing God for. Create a visual representation of what you have received in faith and keep it in front of you." },
+              { step: "02", title: "Believe It", desc: "Return every day. Keep God's Word and your vision in front of you, and believe even before you see it come to pass." },
+              { step: "03", title: "Thank God for It", desc: "Give thanks now for what you are believing God for. Walk in faith and trust Him with the how." },
             ].map((s) => (
               <div key={s.step} className="text-center md:text-left">
                 <p className="text-5xl font-bold text-black mb-4">{s.step}</p>
