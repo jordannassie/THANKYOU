@@ -63,7 +63,7 @@ function ResetPasswordForm() {
       <div className="hidden md:flex md:w-1/2 bg-black text-white flex-col justify-between p-12">
         <div>
           <h1 className="text-2xl font-bold">Thank You.</h1>
-          <p className="text-sm text-white/50 mt-1 tracking-wide">See it. Believe it. Receive it.</p>
+          <p className="text-sm text-white/50 mt-1 tracking-wide">Receive. Believe. Thank.</p>
         </div>
         <blockquote className="font-serif text-2xl leading-relaxed text-white/90 italic">
           &ldquo;Commit to the Lord whatever you do, and He will establish your plans.&rdquo;
@@ -76,7 +76,7 @@ function ResetPasswordForm() {
       <div className="flex-1 flex flex-col justify-center px-6 py-12 md:px-16 lg:px-24 bg-white">
         <div className="md:hidden mb-10">
           <h1 className="text-2xl font-bold">Thank You.</h1>
-          <p className="text-sm text-gray-400 mt-1 tracking-wide">See it. Believe it. Receive it.</p>
+          <p className="text-sm text-gray-400 mt-1 tracking-wide">Receive. Believe. Thank.</p>
         </div>
 
         <div className="max-w-sm w-full mx-auto">

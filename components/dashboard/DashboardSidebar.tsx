@@ -40,7 +40,7 @@ export default function DashboardSidebar() {
       {/* Brand */}
       <div className="px-6 pt-8 pb-6 border-b border-white/10">
         <h1 className="text-xl font-bold tracking-tight">Thank You.</h1>
-        <p className="text-xs text-white/50 mt-1 tracking-wide">See it. Believe it. Receive it.</p>
+        <p className="text-xs text-white/50 mt-1 tracking-wide">Receive. Believe. Thank.</p>
       </div>
 
       {/* Navigation */}

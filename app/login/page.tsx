@@ -99,7 +99,7 @@ function LoginContent() {
         <div className="hidden md:flex md:w-1/2 bg-black text-white flex-col justify-between p-12">
           <div>
             <h1 className="text-2xl font-bold">Thank You.</h1>
-            <p className="text-sm text-white/50 mt-1 tracking-wide">See it. Believe it. Receive it.</p>
+            <p className="text-sm text-white/50 mt-1 tracking-wide">Receive. Believe. Thank.</p>
           </div>
           <div className="space-y-6">
             <blockquote className="font-serif text-2xl md:text-3xl leading-relaxed text-white/90 italic">
@@ -125,7 +125,7 @@ function LoginContent() {
           {/* Mobile brand */}
           <div className="md:hidden mb-10">
             <h1 className="text-2xl font-bold">Thank You.</h1>
-            <p className="text-sm text-gray-400 mt-1 tracking-wide">See it. Believe it. Receive it.</p>
+            <p className="text-sm text-gray-400 mt-1 tracking-wide">Receive. Believe. Thank.</p>
           </div>
 
           <div className="max-w-sm w-full mx-auto">

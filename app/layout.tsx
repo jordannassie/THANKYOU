@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Thank You. — See it. Believe it. Receive it.",
+  title: "Thank You. — Receive. Believe. Thank.",
   description: "Create your vision. Write it down. Give thanks. Keep believing. Watch what God does.",
   keywords: ["vision board", "faith", "gratitude", "prayer", "personal development"],
   openGraph: {

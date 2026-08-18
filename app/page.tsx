@@ -104,7 +104,7 @@ export default function LandingPage() {
       <section className="pt-20 pb-20 md:pt-28 md:pb-28 px-5">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm font-medium text-gray-400 tracking-widest uppercase mb-6">
-            See it. Believe it. Receive it.
+            Receive. Believe. Thank.
           </p>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
             See the future you are<br className="hidden sm:block" />
@@ -147,7 +147,7 @@ export default function LandingPage() {
             <div className="flex min-h-[500px]">
               <div className="hidden sm:flex w-44 bg-black text-white flex-col px-4 py-5 shrink-0">
                 <p className="text-sm font-bold mb-1">Thank You.</p>
-                <p className="text-[9px] text-white/40 mb-5">See it. Believe it. Receive it.</p>
+                <p className="text-[9px] text-white/40 mb-5">Receive. Believe. Thank.</p>
                 {["Dashboard", "Vision Board", "Notes", "Community", "Account"].map((item, i) => (
                   <div key={item} className={`text-xs px-2 py-2 rounded-lg mb-0.5 ${i === 0 ? "bg-white text-black font-medium" : "text-white/50"}`}>
                     {item}
@@ -381,7 +381,7 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
             <div>
               <p className="text-base font-bold">Thank You.</p>
-              <p className="text-sm text-gray-400 mt-1">See it. Believe it. Receive it.</p>
+              <p className="text-sm text-gray-400 mt-1">Receive. Believe. Thank.</p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-5">
               {[
