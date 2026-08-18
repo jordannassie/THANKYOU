@@ -17,6 +17,38 @@ import {
 } from "lucide-react";
 import ZoomCountdownBar from "@/components/ZoomCountdownBar";
 import Globe from "@/components/Globe";
+
+const HERO_WORDS = ["receiving", "believing", "thanking"];
+
+function HeroWord() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // fade out
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % HERO_WORDS.length);
+        setVisible(true);
+      }, 400);
+    }, 2600);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <span
+      className="font-serif italic font-normal inline-block"
+      style={{
+        transition: "opacity 0.4s ease, transform 0.4s ease",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(-8px)",
+      }}
+    >
+      {" "}{HERO_WORDS[index]}
+    </span>
+  );
+}
 import {
   BOOK_TITLE,
   BOOK_SUBTITLE,
@@ -141,7 +173,7 @@ export default function LandingPage() {
           </p>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
             See the future you are<br className="hidden sm:block" />
-            <span className="font-serif italic font-normal"> believing God for.</span>
+            <HeroWord /> God for.
           </h1>
           <p className="text-lg text-gray-500 mt-8 max-w-xl mx-auto leading-relaxed">
             Create your vision. Write it down. Give thanks. Keep believing. Watch what God does.
