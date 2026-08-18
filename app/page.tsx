@@ -382,11 +382,16 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-12">
             {/* Photo */}
-            <div className="shrink-0">
+            <div className="shrink-0 flex flex-col sm:flex-row md:flex-col gap-4 items-center">
               <img
                 src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Jordan%20Profile.PNG"
                 alt="Jordan Nassie"
                 className="w-48 h-48 md:w-56 md:h-56 rounded-2xl object-cover object-top shadow-sm"
+              />
+              <img
+                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/susie.png"
+                alt="Jordan and Susie Nassie"
+                className="w-36 h-28 md:w-44 md:h-32 rounded-2xl object-cover object-center shadow-sm"
               />
             </div>
 
