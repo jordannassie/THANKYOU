@@ -412,7 +412,7 @@ export default function LandingPage() {
 
             {/* Copy */}
             <div className="text-center lg:text-left">
-              <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-3">About the Author</p>
+              <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-3">About the Founder</p>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-5">Jordan Nassie</h2>
               <p className="text-gray-500 leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0">
                 Jordan Nassie is a faith-driven entrepreneur, speaker, and author who believes every God-given dream deserves to be seen, spoken, and thanked for before it arrives. Through the Thank You. book and membership, Jordan helps people build a daily practice of faith, vision, and gratitude.
