@@ -3,62 +3,82 @@
 import { useEffect, useRef } from "react";
 import createGlobe from "cobe";
 
-const THETA = 0.35; // fixed globe tilt
+// Must match the globe config
+const THETA = 0.35;
+// Radius factor: COBE renders the globe within NDC radius 0.8
+const GLOBE_NDC_RADIUS = 0.8;
 
 const CITIES = [
-  { name: "Dallas, TX",     lat: 32.7767,  lon: -96.797  },
-  { name: "London, UK",     lat: 51.5074,  lon:  -0.1278 },
-  { name: "Dubai, UAE",     lat: 25.2048,  lon:  55.2708 },
-  { name: "Hong Kong",      lat: 22.3193,  lon: 114.1694 },
-  { name: "Johannesburg",   lat: -26.2041, lon:  28.0473 },
+  { name: "Dallas, TX",   lat:  32.7767, lon:  -96.797 },
+  { name: "London, UK",   lat:  51.5074, lon:   -0.1278 },
+  { name: "Dubai, UAE",   lat:  25.2048, lon:   55.2708 },
+  { name: "Hong Kong",    lat:  22.3193, lon:  114.1694 },
+  { name: "Johannesburg", lat: -26.2041, lon:   28.0473 },
 ];
 
 /**
- * Project a lat/lon to canvas-CSS pixel coords given the current phi.
- * Returns visible=true only when the point faces the camera (z3 > 0).
+ * Accurate projection matching COBE's internal WebGL coordinate system.
+ *
+ * COBE converts (lat, lon) → 3D via:
+ *   a = lon_rad - π
+ *   px = -cos(lat) * cos(a)  =  cos(lat) * cos(lon_rad)
+ *   py =  sin(lat)
+ *   pz =  cos(lat) * sin(a)  = -cos(lat) * sin(lon_rad)   ← note the negative z
+ *
+ * Then it applies rotation matrix A(theta, phi) (GLSL h*A convention).
+ * To project globe→screen we apply the transpose A^T:
+ *   sx =  cos(phi)*px + sin(phi)*pz
+ *   sy =  sin(phi)*sin(theta)*px + cos(theta)*py - cos(phi)*sin(theta)*pz
+ *   sz = -sin(phi)*cos(theta)*px + sin(theta)*py + cos(phi)*cos(theta)*pz
+ *
+ * Visible when sz > 0.  Screen CSS coords: (cx + sx*r, cy - sy*r)
+ * where r = GLOBE_NDC_RADIUS * cssHalf.
  */
 function project(
   lat: number,
   lon: number,
   phi: number,
-  cssSize: number
+  cssW: number
 ): { x: number; y: number; visible: boolean; opacity: number } {
   const latR = (lat * Math.PI) / 180;
   const lonR = (lon * Math.PI) / 180;
 
-  // Globe-local cartesian
-  const px = Math.cos(latR) * Math.cos(lonR);
-  const py = Math.sin(latR);
-  const pz = Math.cos(latR) * Math.sin(lonR);
+  // Globe-local 3D (COBE convention — z is negated vs standard spherical)
+  const px =  Math.cos(latR) * Math.cos(lonR);
+  const py =  Math.sin(latR);
+  const pz = -Math.cos(latR) * Math.sin(lonR);
 
-  // Rotate around Y by phi (globe rotation)
+  // Projection: globe-space → screen-space via A^T(theta, phi)
   const cosPhi = Math.cos(phi);
   const sinPhi = Math.sin(phi);
-  const px2 = px * cosPhi + pz * sinPhi;
-  const py2 = py;
-  const pz2 = -px * sinPhi + pz * cosPhi;
+  const cosT   = Math.cos(THETA);
+  const sinT   = Math.sin(THETA);
 
-  // Rotate around X by -THETA (globe tilt)
-  const cosT = Math.cos(-THETA);
-  const sinT = Math.sin(-THETA);
-  const py3 = py2 * cosT - pz2 * sinT;
-  const pz3 = py2 * sinT + pz2 * cosT;
+  const sx =  cosPhi * px + sinPhi * pz;
+  const sy =  sinPhi * sinT * px + cosT * py - cosPhi * sinT * pz;
+  const sz = -sinPhi * cosT * px + sinT * py + cosPhi * cosT * pz;
 
-  const r = cssSize / 2;
+  const r = GLOBE_NDC_RADIUS * (cssW / 2);
+
   return {
-    x: cssSize / 2 + px2 * r * 0.96,
-    y: cssSize / 2 - py3 * r * 0.96,
-    visible: pz3 > -0.05,
-    opacity: Math.max(0, Math.min(1, (pz3 + 0.08) / 0.18)),
+    x: cssW / 2 + sx * r,
+    y: cssW / 2 - sy * r,
+    visible: sz > 0,
+    // Fade labels in as they rotate into view, out as they rotate away
+    opacity: Math.max(0, Math.min(1, (sz + 0.06) / 0.18)),
   };
 }
+
+// phi that puts Dallas roughly front-and-center at start
+// facing_lon = -(phi + π/2) → phi = -(lon_rad + π/2)
+const DALLAS_LON_RAD = (-96.797 * Math.PI) / 180;
+const INITIAL_PHI = -(DALLAS_LON_RAD + Math.PI / 2); // ≈ 0.118
 
 export default function Globe() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef    = useRef<HTMLCanvasElement>(null);
-  // One ref per label div — direct DOM mutation avoids React re-renders
   const labelRefs    = useRef<(HTMLDivElement | null)[]>([]);
-  const phiRef       = useRef(0);
+  const phiRef       = useRef(INITIAL_PHI);
 
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
@@ -83,23 +103,26 @@ export default function Globe() {
       baseColor:   [0.1,  0.1,  0.18],
       markerColor: [1,    1,    1   ],
       glowColor:   [0.15, 0.25, 0.6 ],
-      markers: CITIES.map((c) => ({ location: [c.lat, c.lon] as [number,number], size: 0.06 })),
+      markers: CITIES.map((c) => ({
+        location: [c.lat, c.lon] as [number, number],
+        size: 0.06,
+      })),
     });
 
     let animId: number;
 
     function animate() {
-      phiRef.current += 0.004; // continuous slow rotation
+      phiRef.current += 0.004; // slow continuous world tour
       globe.update({ phi: phiRef.current, width: cssW * 2, height: cssW * 2 });
 
-      // Directly update label DOM elements — no React re-render needed
+      // Reposition each label directly in the DOM — no React re-render
       CITIES.forEach((city, i) => {
         const el = labelRefs.current[i];
         if (!el) return;
         const p = project(city.lat, city.lon, phiRef.current, cssW);
         el.style.left    = `${p.x}px`;
         el.style.top     = `${p.y}px`;
-        el.style.opacity = String(p.opacity);
+        el.style.opacity = String(p.opacity.toFixed(3));
         el.style.display = p.visible ? "block" : "none";
       });
 
@@ -125,7 +148,6 @@ export default function Globe() {
         style={{ contain: "layout paint size" }}
       />
 
-      {/* City label overlays — positioned via direct DOM in animate() */}
       {CITIES.map((city, i) => (
         <div
           key={city.name}
@@ -134,19 +156,19 @@ export default function Globe() {
           style={{
             display:   "none",
             opacity:   0,
-            transform: "translate(-50%, -100%)",
-            marginTop: "-10px",
+            // Centre the label horizontally above the dot
+            transform: "translate(-50%, calc(-100% - 6px))",
           }}
         >
-          {/* Line from dot upward */}
           <div className="flex flex-col items-center">
-            <div
-              className="text-white font-semibold whitespace-nowrap bg-white/10 backdrop-blur-sm border border-white/20 rounded px-1.5 py-0.5 mb-1"
-              style={{ fontSize: "9px", letterSpacing: "0.04em" }}
+            <span
+              className="whitespace-nowrap bg-white/10 backdrop-blur-sm border border-white/25 text-white font-semibold rounded px-2 py-0.5 leading-tight"
+              style={{ fontSize: "9px", letterSpacing: "0.05em" }}
             >
               {city.name}
-            </div>
-            <div className="w-px h-2 bg-white/50" />
+            </span>
+            {/* Connector line from label down to dot */}
+            <div className="w-px h-2 bg-white/40 mt-0.5" />
           </div>
         </div>
       ))}
