@@ -378,37 +378,51 @@ export default function LandingPage() {
       </section>
 
       {/* Jordan Nassie — About the Author */}
-      <section className="py-24 px-5 bg-gray-50">
+      <section className="py-24 px-5 bg-gray-50 overflow-hidden">
         <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-12">
-            {/* Photo */}
-            <div className="shrink-0 flex flex-col sm:flex-row md:flex-col gap-4 items-center">
-              <img
-                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Jordan%20Profile.PNG"
-                alt="Jordan Nassie"
-                className="w-48 h-48 md:w-56 md:h-56 rounded-2xl object-cover object-top shadow-sm"
-              />
-              <img
-                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/susie.png"
-                alt="Jordan and Susie Nassie"
-                className="w-36 h-28 md:w-44 md:h-32 rounded-2xl object-cover object-center shadow-sm"
-              />
+          <div className="flex flex-col lg:flex-row items-center gap-14">
+
+            {/* Photo collage */}
+            <div className="shrink-0 w-full lg:w-auto">
+              <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto lg:max-w-none lg:w-[380px]">
+                {/* Left column — tall portrait */}
+                <div className="row-span-2">
+                  <img
+                    src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Jordan%20Profile.PNG"
+                    alt="Jordan Nassie"
+                    className="w-full h-full object-cover object-top rounded-2xl shadow-md"
+                    style={{ minHeight: "280px", maxHeight: "380px" }}
+                  />
+                </div>
+                {/* Right column — two stacked photos */}
+                <div className="flex flex-col gap-3">
+                  <img
+                    src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Jands.jpg"
+                    alt="Jordan and Susie"
+                    className="w-full h-40 object-cover object-center rounded-2xl shadow-md"
+                  />
+                  <img
+                    src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/susie.png"
+                    alt="Jordan and Susie Nassie"
+                    className="w-full h-40 object-cover object-top rounded-2xl shadow-md"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Copy */}
-            <div className="text-center md:text-left max-w-xl">
+            <div className="text-center lg:text-left">
               <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-3">About the Author</p>
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Jordan Nassie</h2>
-              <p className="text-gray-500 leading-relaxed mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-5">Jordan Nassie</h2>
+              <p className="text-gray-500 leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0">
                 Jordan Nassie is a faith-driven entrepreneur, speaker, and author who believes every God-given dream deserves to be seen, spoken, and thanked for before it arrives. Through the Thank You. book and membership, Jordan helps people build a daily practice of faith, vision, and gratitude.
               </p>
 
-              {/* Amazon CTA */}
               <a
                 href={BOOK_AMAZON_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-black text-white font-medium px-6 py-3 rounded-xl hover:bg-gray-900 transition-colors text-sm"
+                className="inline-flex items-center gap-3 bg-black text-white font-medium px-6 py-3.5 rounded-xl hover:bg-gray-900 transition-colors text-sm"
               >
                 <img
                   src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Amazon_logo.svg.webp"

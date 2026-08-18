@@ -35,7 +35,7 @@ function generateId(): string {
 // ── Component ────────────────────────────────────────────────
 
 export default function VisionBoardPage() {
-  const { user } = useUser();
+  const { user, isDemo } = useUser();
   // Memoize the client so it doesn't change identity on every render
   const supabase = useMemo(() => createClient(), []);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -365,54 +365,72 @@ export default function VisionBoardPage() {
               </button>
             </div>
 
-            <p className="text-sm text-gray-500 mb-4">
-              Describe the vision you are believing God for and we will generate an image.
-            </p>
+            {/* Demo / unauthenticated gate */}
+            {(isDemo || !user) ? (
+              <>
+                <div className="bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-sm text-gray-500 mb-4">
+                  <strong className="text-black block mb-1">Sign in to generate images</strong>
+                  Create a free account to start building your vision board with AI-generated images.
+                </div>
+                <button
+                  onClick={() => { setShowGenerateModal(false); setGenerateError(""); }}
+                  className="w-full border border-gray-200 text-sm font-medium py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  Close
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-gray-500 mb-4">
+                  Describe the vision you are believing God for and we will generate an image.
+                </p>
 
-            <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="e.g. A beautiful white home with a pool overlooking the ocean at sunset..."
-              rows={4}
-              maxLength={1000}
-              disabled={generating}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 resize-none disabled:opacity-50"
-            />
-            <p className="text-xs text-gray-400 mt-1 text-right">{prompt.length}/1000</p>
+                <textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="e.g. A beautiful white home with a pool overlooking the ocean at sunset..."
+                  rows={4}
+                  maxLength={1000}
+                  disabled={generating}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 resize-none disabled:opacity-50"
+                />
+                <p className="text-xs text-gray-400 mt-1 text-right">{prompt.length}/1000</p>
 
-            {generateError && (
-              <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl mt-3">
-                {generateError}
-              </p>
-            )}
-
-            {generating && (
-              <div className="mt-3 flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl">
-                <Loader2 size={15} className="animate-spin shrink-0" />
-                Creating your vision… this may take 20–40 seconds.
-              </div>
-            )}
-
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={() => { setShowGenerateModal(false); setGenerateError(""); }}
-                disabled={generating}
-                className="flex-1 border border-gray-200 text-sm font-medium py-3 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleGenerate}
-                disabled={generating || prompt.trim().length < 3}
-                className="flex-1 bg-black text-white text-sm font-medium py-3 rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {generating ? (
-                  <><Loader2 size={14} className="animate-spin" /> Generating…</>
-                ) : (
-                  <><Sparkles size={14} /> Generate</>
+                {generateError && (
+                  <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl mt-3">
+                    {generateError}
+                  </p>
                 )}
-              </button>
-            </div>
+
+                {generating && (
+                  <div className="mt-3 flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl">
+                    <Loader2 size={15} className="animate-spin shrink-0" />
+                    Creating your vision… this may take 20–40 seconds.
+                  </div>
+                )}
+
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={() => { setShowGenerateModal(false); setGenerateError(""); }}
+                    disabled={generating}
+                    className="flex-1 border border-gray-200 text-sm font-medium py-3 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleGenerate}
+                    disabled={generating || prompt.trim().length < 3}
+                    className="flex-1 bg-black text-white text-sm font-medium py-3 rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {generating ? (
+                      <><Loader2 size={14} className="animate-spin" /> Generating…</>
+                    ) : (
+                      <><Sparkles size={14} /> Generate</>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
