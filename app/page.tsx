@@ -375,6 +375,46 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Jordan Nassie — About the Author */}
+      <section className="py-24 px-5 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-12">
+            {/* Photo */}
+            <div className="shrink-0">
+              <img
+                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Jordan%20Profile.PNG"
+                alt="Jordan Nassie"
+                className="w-48 h-48 md:w-56 md:h-56 rounded-2xl object-cover object-top shadow-sm"
+              />
+            </div>
+
+            {/* Copy */}
+            <div className="text-center md:text-left max-w-xl">
+              <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-3">About the Author</p>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Jordan Nassie</h2>
+              <p className="text-gray-500 leading-relaxed mb-6">
+                Jordan Nassie is a faith-driven entrepreneur, speaker, and author who believes every God-given dream deserves to be seen, spoken, and thanked for before it arrives. Through the Thank You. book and membership, Jordan helps people build a daily practice of faith, vision, and gratitude.
+              </p>
+
+              {/* Amazon CTA */}
+              <a
+                href={BOOK_AMAZON_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-black text-white font-medium px-6 py-3 rounded-xl hover:bg-gray-900 transition-colors text-sm"
+              >
+                <img
+                  src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Amazon_logo.svg.webp"
+                  alt="Amazon"
+                  className="h-5 brightness-0 invert"
+                />
+                Get the Book on Amazon
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-gray-100 py-12 px-5">
         <div className="max-w-5xl mx-auto">
