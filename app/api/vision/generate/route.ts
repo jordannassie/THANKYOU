@@ -22,7 +22,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 const MODEL = "gpt-image-2";
 const SIZE = "1024x1024" as const;
-const QUALITY = "medium" as const;
+const QUALITY = "low" as const;
 const MAX_PROMPT_CHARS = 1000;
 const MIN_PROMPT_CHARS = 3;
 const STORAGE_BUCKET = "vision-board";
