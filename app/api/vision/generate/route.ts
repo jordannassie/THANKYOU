@@ -20,7 +20,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 // ── Constants ────────────────────────────────────────────────
 
-const MODEL = "gpt-image-1";
+const MODEL = "gpt-image-2";
 const SIZE = "1024x1024" as const;
 const QUALITY = "medium" as const;
 const MAX_PROMPT_CHARS = 1000;
