@@ -13,10 +13,6 @@ import DreamDeclaration from "@/components/dashboard/DreamDeclaration";
 import VisionGrid from "@/components/dashboard/VisionGrid";
 import NotesPreview from "@/components/dashboard/NotesPreview";
 
-function generateId(): string {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
 
 export default function DashboardPage() {
   const { user, profile } = useUser();
@@ -36,15 +32,17 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!pollingJobId || !generating) return;
 
-    let stopped = false;
+    let stopped     = false;
+    let notFoundCount = 0;
     const POLL_TIMEOUT = 5 * 60 * 1000;
-    const startedAt = Date.now();
+    const startedAt    = Date.now();
 
     const poll = async () => {
       if (stopped) return;
 
       if (Date.now() - startedAt > POLL_TIMEOUT) {
-        setGenerateError("Generation is taking too long. Please try again.");
+        stopped = true;
+        setGenerateError("Generation timed out after 5 minutes. Please try again.");
         setGenerating(false);
         setPollingJobId(null);
         return;
@@ -52,7 +50,30 @@ export default function DashboardPage() {
 
       try {
         const res = await fetch(`/api/vision/job/${pollingJobId}`);
-        if (!res.ok) { setTimeout(poll, 3000); return; }
+
+        if (res.status === 404) {
+          notFoundCount++;
+          if (notFoundCount >= 4) {
+            stopped = true;
+            setGenerateError(
+              "Job not found. Please run the SQL migration (004_vision_jobs.sql) in Supabase and try again."
+            );
+            setGenerating(false);
+            setPollingJobId(null);
+            return;
+          }
+          setTimeout(poll, 3000);
+          return;
+        }
+
+        if (!res.ok) {
+          const json = await res.json().catch(() => ({})) as { error?: string };
+          stopped = true;
+          setGenerateError(json.error ?? `Server error (${res.status}).`);
+          setGenerating(false);
+          setPollingJobId(null);
+          return;
+        }
 
         const job = await res.json() as { status: string; error_message?: string | null };
 
@@ -68,14 +89,14 @@ export default function DashboardPage() {
           setGenerating(false);
           setPollingJobId(null);
         } else {
-          setTimeout(poll, 3000);
+          setTimeout(poll, 4000);
         }
       } catch {
-        if (!stopped) setTimeout(poll, 4000);
+        if (!stopped) setTimeout(poll, 5000);
       }
     };
 
-    const timer = setTimeout(poll, 3000);
+    const timer = setTimeout(poll, 2000);
     return () => { stopped = true; clearTimeout(timer); };
   }, [pollingJobId, generating]);
 
@@ -85,27 +106,21 @@ export default function DashboardPage() {
     setGenerateError("");
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const accessToken = session?.access_token;
+      const res = await fetch("/api/vision/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: visionPrompt.trim() }),
+      });
 
-      if (!accessToken) {
-        setGenerateError("Session expired. Please sign in again.");
+      const json = await res.json() as { jobId?: string; error?: string };
+
+      if (!res.ok || !json.jobId) {
+        setGenerateError(json.error ?? `Server error (${res.status}). Please try again.`);
         setGenerating(false);
         return;
       }
 
-      const jobId = generateId();
-
-      fetch("/.netlify/functions/vision-generate-background", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ jobId, prompt: visionPrompt.trim() }),
-      }).catch(() => {});
-
-      setPollingJobId(jobId);
+      setPollingJobId(json.jobId);
     } catch (err) {
       setGenerateError(err instanceof Error ? err.message : "Network error — please try again.");
       setGenerating(false);

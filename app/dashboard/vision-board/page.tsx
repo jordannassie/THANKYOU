@@ -86,21 +86,22 @@ export default function VisionBoardPage() {
     return () => { cancelled = true; };
   }, [supabase, refreshKey]);
 
-  // ── Background job polling ────────────────────────────────
+  // ── Job polling ──────────────────────────────────────────
 
   useEffect(() => {
     if (!pollingJobId || !generating) return;
 
     let stopped = false;
-    // Timeout: stop polling after 5 minutes
     const POLL_TIMEOUT = 5 * 60 * 1000;
-    const startedAt = Date.now();
+    const startedAt    = Date.now();
+    let notFoundCount  = 0;
 
     const poll = async () => {
       if (stopped) return;
 
       if (Date.now() - startedAt > POLL_TIMEOUT) {
-        setGenerateError("Generation is taking too long. Please try again.");
+        stopped = true;
+        setGenerateError("Generation timed out after 5 minutes. Please try again.");
         setGenerating(false);
         setPollingJobId(null);
         return;
@@ -108,43 +109,57 @@ export default function VisionBoardPage() {
 
       try {
         const res = await fetch(`/api/vision/job/${pollingJobId}`);
-        if (!res.ok) {
-          // Job not found yet (background function may not have written it yet)
+
+        // 404 = job missing (DB migration not run, or real error)
+        if (res.status === 404) {
+          notFoundCount++;
+          if (notFoundCount >= 4) {
+            stopped = true;
+            setGenerateError(
+              "Job not found. Please run the SQL migration (004_vision_jobs.sql) in Supabase and try again."
+            );
+            setGenerating(false);
+            setPollingJobId(null);
+            return;
+          }
           setTimeout(poll, 3000);
           return;
         }
-        const job = await res.json() as {
-          status: string;
-          error_message?: string | null;
-        };
+
+        if (!res.ok) {
+          const json = await res.json().catch(() => ({})) as { error?: string };
+          stopped = true;
+          setGenerateError(json.error ?? `Server error (${res.status}). Please try again.`);
+          setGenerating(false);
+          setPollingJobId(null);
+          return;
+        }
+
+        const job = await res.json() as { status: string; error_message?: string | null };
 
         if (job.status === "completed") {
           stopped = true;
-          setRefreshKey((k) => k + 1); // Re-fetch grid from Supabase
+          setRefreshKey((k) => k + 1);
           setPrompt("");
           setShowGenerateModal(false);
           setGenerating(false);
           setPollingJobId(null);
         } else if (job.status === "failed") {
           stopped = true;
-          setGenerateError(
-            job.error_message ??
-              "Generation failed. Please try again."
-          );
+          setGenerateError(job.error_message ?? "Generation failed. Please try again.");
           setGenerating(false);
           setPollingJobId(null);
         } else {
-          // Still pending / processing — poll again in 3s
-          setTimeout(poll, 3000);
+          // pending / processing — keep polling
+          setTimeout(poll, 4000);
         }
       } catch {
-        // Network glitch — keep polling
-        if (!stopped) setTimeout(poll, 4000);
+        // Network glitch — keep trying
+        if (!stopped) setTimeout(poll, 5000);
       }
     };
 
-    // Start first poll after a short delay to let the function spin up
-    const timer = setTimeout(poll, 3000);
+    const timer = setTimeout(poll, 2000);
     return () => {
       stopped = true;
       clearTimeout(timer);
@@ -164,35 +179,23 @@ export default function VisionBoardPage() {
     setGenerateError("");
 
     try {
-      // Get the Supabase access token so the background function can auth
-      const { data: { session } } = await supabase.auth.getSession();
-      const accessToken = session?.access_token;
+      // Submit to FAL queue — returns in ~300 ms with a jobId
+      const res = await fetch("/api/vision/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: prompt.trim() }),
+      });
 
-      if (!accessToken) {
-        setGenerateError("Session expired. Please sign in again.");
+      const json = await res.json() as { jobId?: string; error?: string };
+
+      if (!res.ok || !json.jobId) {
+        setGenerateError(json.error ?? `Server error (${res.status}). Please try again.`);
         setGenerating(false);
         return;
       }
 
-      // Generate a job ID on the client so we know what to poll
-      const jobId = generateId();
-
-      // Fire the background function — it returns 202 immediately.
-      // We intentionally do NOT await a meaningful response body.
-      fetch("/.netlify/functions/vision-generate-background", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ jobId, prompt: prompt.trim() }),
-      }).catch(() => {
-        // Ignore network errors — the job might still be running
-      });
-
       // Start polling for the job result
-      setPollingJobId(jobId);
-      // generating stays true; polling effect will clear it when done
+      setPollingJobId(json.jobId);
     } catch (err) {
       setGenerateError(
         err instanceof Error ? err.message : "Network error — please try again."
