@@ -631,7 +631,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-4 mt-5">
                 {/* Instagram */}
                 <a
-                  href="https://www.instagram.com/jordannassie"
+                  href="https://www.instagram.com/thankyougroups"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
@@ -645,7 +645,7 @@ export default function LandingPage() {
                 </a>
                 {/* Facebook */}
                 <a
-                  href="https://www.facebook.com/jordannassie"
+                  href="https://www.facebook.com/thankyougroups/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
