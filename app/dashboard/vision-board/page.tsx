@@ -18,7 +18,7 @@ import type { VisionImage } from "@/lib/types";
 
 // ── Constants ────────────────────────────────────────────────
 
-const STORAGE_BUCKET = "vision-board";
+const STORAGE_BUCKET = "STORAGE";
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
@@ -230,7 +230,7 @@ export default function VisionBoardPage() {
 
     const imageId = generateId();
     const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
-    const storagePath = `${user.id}/uploads/${imageId}.${ext}`;
+    const storagePath = `vision-board/${user.id}/uploads/${imageId}.${ext}`;
 
     const { error: uploadErr } = await supabase.storage
       .from(STORAGE_BUCKET)

@@ -25,7 +25,7 @@ const SUPABASE_ANON_KEY    = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const FAL_KEY              = process.env.FAL_KEY!;
 
-const STORAGE_BUCKET = "vision-board";
+const STORAGE_BUCKET = "STORAGE";
 const FAL_MODEL      = "fal-ai/flux/dev";
 
 const SYSTEM_PREFIX = `Create an inspiring, aspirational vision-board image.
@@ -167,7 +167,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
 
   // ── 7. Upload to Supabase Storage ───────────────────────────────────
   const imageId     = randomUUID();
-  const storagePath = `${user.id}/generated/${imageId}.jpg`;
+  const storagePath = `vision-board/${user.id}/generated/${imageId}.jpg`;
 
   console.log(`[vision-bg] Job ${jobId}: uploading to storage at ${storagePath}`);
 
