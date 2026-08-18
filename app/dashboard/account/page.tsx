@@ -16,12 +16,15 @@ export default function AccountPage() {
   const { user, profile } = useUser();
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const { isDemo } = useUser();
+
   const [name, setName] = useState(profile?.full_name ?? "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url ?? "");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [prefs, setPrefs] = useState(mockPreferences);
 
   const initials = getInitials(profile, user?.email);
@@ -55,17 +58,30 @@ export default function AccountPage() {
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) return;
+    if (!file) return;
+    if (!user) {
+      setUploadError("Sign in to upload a profile photo.");
+      return;
+    }
+
+    // Validate size (5 MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("Image must be under 5 MB.");
+      return;
+    }
+
     setUploading(true);
+    setUploadError("");
 
     const ext = file.name.split(".").pop();
     const path = `${user.id}/avatar.${ext}`;
 
-    const { error: uploadError } = await supabase.storage
+    const { error: storageError } = await supabase.storage
       .from("avatars")
       .upload(path, file, { upsert: true });
 
-    if (uploadError) {
+    if (storageError) {
+      setUploadError(`Upload failed: ${storageError.message}`);
       setUploading(false);
       return;
     }
@@ -73,12 +89,16 @@ export default function AccountPage() {
     const { data } = supabase.storage.from("avatars").getPublicUrl(path);
     const publicUrl = `${data.publicUrl}?t=${Date.now()}`;
 
-    await supabase
+    const { error: dbError } = await supabase
       .from("profiles")
       .update({ avatar_url: publicUrl })
       .eq("id", user.id);
 
-    setAvatarUrl(publicUrl);
+    if (dbError) {
+      setUploadError(`Profile update failed: ${dbError.message}`);
+    } else {
+      setAvatarUrl(publicUrl);
+    }
     setUploading(false);
   };
 
@@ -99,6 +119,13 @@ export default function AccountPage() {
         <h1 className="text-2xl font-bold tracking-tight">Account</h1>
         <p className="text-gray-500 text-sm mt-1">Manage your profile, membership, and preferences.</p>
       </div>
+
+      {/* Demo notice */}
+      {isDemo && (
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-sm text-gray-500">
+          You are viewing a <strong className="text-black">demo account</strong>. Sign in to save changes and upload a profile photo.
+        </div>
+      )}
 
       {/* Profile */}
       <section className="bg-white border border-gray-200 rounded-2xl p-6">
@@ -155,12 +182,15 @@ export default function AccountPage() {
             />
             <p className="text-xs text-gray-400 mt-1">Email changes are managed through account security.</p>
           </div>
+          {uploadError && (
+            <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl">{uploadError}</p>
+          )}
           {saveError && (
             <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl">{saveError}</p>
           )}
           <button
             onClick={handleSaveProfile}
-            disabled={saving}
+            disabled={saving || isDemo}
             className="w-full bg-black text-white text-sm font-medium py-2.5 rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {saving && <Loader2 size={14} className="animate-spin" />}
