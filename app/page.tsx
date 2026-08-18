@@ -385,7 +385,10 @@ export default function LandingPage() {
                 </div>
                 <div className="p-4 bg-black text-white rounded-xl">
                   <p className="text-xs font-semibold tracking-wider uppercase text-white/40 mb-1">Membership</p>
-                  <p className="text-xl font-bold mb-1">{MEMBERSHIP_PRICE}</p>
+                  <div className="mb-1 flex items-baseline gap-1.5">
+                    <span className="text-xs text-white/30 line-through">$299</span>
+                    <span className="text-xl font-bold">{MEMBERSHIP_PRICE}</span>
+                  </div>
                   <p className="text-xs text-white/60">Live the journey every day.</p>
                 </div>
               </div>
@@ -399,9 +402,12 @@ export default function LandingPage() {
         <div className="max-w-md mx-auto text-center">
           <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4">Membership</p>
           <h2 className="text-4xl font-bold tracking-tight mb-2">Thank You. Membership</h2>
-          <p className="text-5xl font-bold mt-6 mb-8">
-            $99<span className="text-2xl text-white/50">/mo</span>
-          </p>
+          <div className="mt-6 mb-2">
+            <span className="text-lg text-white/35 line-through mr-2">$299/mo</span>
+            <span className="text-5xl font-bold">$99</span><span className="text-2xl text-white/50">/mo</span>
+          </div>
+          <p className="text-sm font-semibold text-white/70 tracking-wide mb-1">Founding Member Price</p>
+          <p className="text-xs text-white/40 mb-8">Lock in $99/month before we reach 1,000 members.</p>
           <ul className="space-y-3 text-left mb-8 max-w-xs mx-auto">
             {MEMBERSHIP_FEATURES.map((f) => (
               <li key={f} className="flex items-center gap-3 text-sm">
