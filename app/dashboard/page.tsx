@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, Sparkles } from "lucide-react";
+import { Upload, Sparkles, Loader2 } from "lucide-react";
 import { mockDreamDeclaration } from "@/lib/mock-data";
 import { useUser } from "@/components/providers/UserProvider";
 import { getFirstName, getInitials } from "@/lib/types";
@@ -21,14 +21,35 @@ export default function DashboardPage() {
   const [visionPrompt, setVisionPrompt] = useState("");
   const [declaration, setDeclaration] = useState(mockDreamDeclaration);
   const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState("");
+  const [gridRefreshKey, setGridRefreshKey] = useState(0);
 
-  const handleGenerate = () => {
-    if (!visionPrompt.trim()) return;
+  const handleGenerate = async () => {
+    if (!visionPrompt.trim() || generating) return;
     setGenerating(true);
-    setTimeout(() => {
-      setGenerating(false);
-      setVisionPrompt("");
-    }, 1500);
+    setGenerateError("");
+
+    try {
+      const res = await fetch("/api/vision/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: visionPrompt.trim() }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        setGenerateError(json.error ?? "We couldn't create that image. Please try again.");
+      } else {
+        setVisionPrompt("");
+        // Increment key so VisionGrid re-fetches
+        setGridRefreshKey((k) => k + 1);
+      }
+    } catch {
+      setGenerateError("We couldn't create that image. Please try again.");
+    }
+
+    setGenerating(false);
   };
 
   return (
@@ -40,6 +61,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 shrink-0 bg-gray-100 flex items-center justify-center text-gray-500 font-semibold text-lg">
               {avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatarUrl} alt={firstName} className="w-full h-full object-cover" />
               ) : (
                 <span>{initials}</span>
@@ -74,14 +96,13 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="inline-flex items-center gap-1.5 border border-gray-200 text-sm font-medium px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors">
+            <a
+              href="/dashboard/vision-board"
+              className="inline-flex items-center gap-1.5 border border-gray-200 text-sm font-medium px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+            >
               <Upload size={14} />
               Upload Image
-            </button>
-            <button className="inline-flex items-center gap-1.5 bg-black text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-gray-900 transition-colors">
-              <Sparkles size={14} />
-              Generate Image
-            </button>
+            </a>
           </div>
         </div>
 
@@ -93,24 +114,42 @@ export default function DashboardPage() {
             onChange={(e) => setVisionPrompt(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
             placeholder="Describe the vision you are believing God for..."
-            className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 bg-white"
+            disabled={generating}
+            className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 bg-white disabled:opacity-50"
           />
           <button
             onClick={handleGenerate}
             disabled={generating || !visionPrompt.trim()}
             className="inline-flex items-center gap-1.5 bg-black text-white text-sm font-medium px-5 py-3 rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Sparkles size={14} />
-            {generating ? "Generating..." : "Generate Image"}
+            {generating ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Sparkles size={14} />
+            )}
+            {generating ? "Generating…" : "Generate Image"}
           </button>
         </div>
+
+        {generateError && (
+          <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl mb-4">
+            {generateError}
+          </p>
+        )}
+
+        {generating && (
+          <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl mb-4">
+            <Loader2 size={15} className="animate-spin shrink-0" />
+            Creating your vision… this may take 20–40 seconds.
+          </div>
+        )}
 
         {/* Dream Declaration */}
         <DreamDeclaration declaration={declaration} onSave={setDeclaration} />
 
-        {/* Vision Grid */}
+        {/* Vision Grid — shows real user images */}
         <div className="mt-6">
-          <VisionGrid />
+          <VisionGrid refreshKey={gridRefreshKey} />
         </div>
       </section>
 

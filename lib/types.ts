@@ -33,3 +33,17 @@ export function getInitials(profile: Profile | null, email?: string | null): str
   if (email) return email[0].toUpperCase();
   return "U";
 }
+
+// ── Vision Board ──────────────────────────────────────────────
+
+export interface VisionImage {
+  id: string;
+  user_id: string;
+  image_url: string;
+  storage_path: string | null;
+  prompt: string | null;
+  source: "generated" | "uploaded";
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
