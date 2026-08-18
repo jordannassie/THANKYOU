@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       n: 1,
       size: SIZE,
       quality: QUALITY,
-      response_format: "b64_json",
+      // gpt-image-1 always returns b64_json — no response_format param needed
     });
 
     const b64 = response.data?.[0]?.b64_json;
