@@ -387,61 +387,83 @@ export default function LandingPage() {
       </section>
 
       {/* Live Call Countdown */}
-      <section className="py-24 px-5 bg-white">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Zoom logo */}
-          <img
-            src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Zoom-Logo.png"
-            alt="Zoom"
-            className="h-10 w-auto mx-auto mb-8 object-contain"
-          />
+      <section className="py-24 px-5" style={{ backgroundColor: "#2D8CFF" }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
 
-          <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-4">Monthly Live Call</p>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">{NEXT_ZOOM_CALL_TITLE}</h2>
-          <p className="text-gray-400 text-sm mb-12">
-            {NEXT_ZOOM_CALL_DATE.toLocaleDateString("en-US", {
-              weekday: "long", month: "long", day: "numeric", year: "numeric",
-            })}
-            {" · "}
-            {NEXT_ZOOM_CALL_DATE.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short" })}
-          </p>
+            {/* Left — text + countdown */}
+            <div className="flex-1 text-center lg:text-left">
+              {/* Zoom logo — inverted white */}
+              <img
+                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Zoom-Logo.png"
+                alt="Zoom"
+                className="h-9 w-auto mb-8 mx-auto lg:mx-0 brightness-0 invert object-contain"
+              />
 
-          {/* Big countdown */}
-          {countdown.live ? (
-            <p className="text-4xl md:text-5xl font-bold tracking-tight text-black">Live Now</p>
-          ) : (
-            <div className="flex items-start justify-center gap-4 md:gap-8">
-              {[
-                { value: countdown.days, label: "DAYS" },
-                { value: countdown.hours, label: "HRS" },
-                { value: countdown.mins, label: "MINS" },
-                { value: countdown.secs, label: "SECS" },
-              ].map(({ value, label }, i) => (
-                <div key={label} className="flex items-start gap-4 md:gap-8">
-                  <div className="text-center">
-                    <p className="text-5xl md:text-7xl font-bold tabular-nums leading-none">
-                      {String(value).padStart(2, "0")}
-                    </p>
-                    <p className="text-xs font-semibold tracking-widest text-gray-400 mt-2">{label}</p>
-                  </div>
-                  {i < 3 && (
-                    <p className="text-4xl md:text-6xl font-light text-gray-200 leading-none mt-1">:</p>
-                  )}
+              <p className="text-xs font-semibold tracking-widest uppercase text-white/60 mb-3">Monthly Live Call</p>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-3">{NEXT_ZOOM_CALL_TITLE}</h2>
+              <p className="text-white/70 text-sm mb-10">
+                {NEXT_ZOOM_CALL_DATE.toLocaleDateString("en-US", {
+                  weekday: "long", month: "long", day: "numeric", year: "numeric",
+                })}
+                {" · "}
+                {NEXT_ZOOM_CALL_DATE.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short" })}
+              </p>
+
+              {/* Big countdown */}
+              {countdown.live ? (
+                <p className="text-4xl md:text-5xl font-bold text-white mb-10">Live Now</p>
+              ) : (
+                <div className="flex items-start justify-center lg:justify-start gap-3 md:gap-6 mb-10">
+                  {[
+                    { value: countdown.days, label: "DAYS" },
+                    { value: countdown.hours, label: "HRS" },
+                    { value: countdown.mins, label: "MINS" },
+                    { value: countdown.secs, label: "SECS" },
+                  ].map(({ value, label }, i) => (
+                    <div key={label} className="flex items-start gap-3 md:gap-6">
+                      <div className="text-center">
+                        <p className="text-5xl md:text-7xl font-bold tabular-nums leading-none text-white">
+                          {String(value).padStart(2, "0")}
+                        </p>
+                        <p className="text-[10px] font-semibold tracking-widest text-white/60 mt-2">{label}</p>
+                      </div>
+                      {i < 3 && (
+                        <p className="text-4xl md:text-6xl font-light text-white/30 leading-none mt-1">:</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              )}
 
-          <a
-            href={NEXT_ZOOM_CALL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 mt-12 bg-black text-white font-medium px-8 py-4 rounded-xl hover:bg-gray-900 transition-colors text-sm"
-          >
-            Join to Attend
-            <ArrowRight size={15} />
-          </a>
-          <p className="text-xs text-gray-400 mt-3">Members only — <Link href="/login" className="underline hover:text-black transition-colors">Join Thank You.</Link> to access live calls.</p>
+              <a
+                href={NEXT_ZOOM_CALL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-white text-[#2D8CFF] font-semibold px-8 py-4 rounded-xl hover:bg-blue-50 transition-colors text-sm"
+              >
+                Join to Attend
+                <ArrowRight size={15} />
+              </a>
+              <p className="text-xs text-white/50 mt-3">
+                Members only —{" "}
+                <Link href="/login" className="underline hover:text-white transition-colors">
+                  Join Thank You.
+                </Link>{" "}
+                to access live calls.
+              </p>
+            </div>
+
+            {/* Right — Zoom screenshot */}
+            <div className="flex-1 w-full lg:w-auto">
+              <img
+                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/axx.png"
+                alt="Thank You. Live Call"
+                className="w-full max-w-lg mx-auto rounded-2xl shadow-2xl shadow-blue-900/40"
+              />
+            </div>
+
+          </div>
         </div>
       </section>
 
