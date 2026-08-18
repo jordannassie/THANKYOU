@@ -16,6 +16,7 @@ import {
   BookMarked,
 } from "lucide-react";
 import ZoomCountdownBar from "@/components/ZoomCountdownBar";
+import Globe from "@/components/Globe";
 import {
   BOOK_TITLE,
   BOOK_SUBTITLE,
@@ -461,6 +462,46 @@ export default function LandingPage() {
                 alt="Thank You. Live Call"
                 className="w-full max-w-lg mx-auto rounded-2xl shadow-2xl shadow-blue-900/40"
               />
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Next Meetup — Globe */}
+      <section className="py-24 px-5 bg-black text-white overflow-hidden">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col-reverse lg:flex-row items-center gap-12">
+
+            {/* Globe */}
+            <div className="flex-1 w-full">
+              <Globe />
+            </div>
+
+            {/* Copy */}
+            <div className="flex-1 text-center lg:text-left">
+              <p className="text-xs font-semibold tracking-widest uppercase text-white/40 mb-4">Next Meetup</p>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+                Dallas, TX
+              </h2>
+              <div className="flex items-center justify-center lg:justify-start gap-2 mb-6">
+                <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                <p className="text-white/60 text-sm">In-person gathering — coming soon</p>
+              </div>
+              <p className="text-white/50 leading-relaxed mb-8 max-w-md mx-auto lg:mx-0">
+                Join Jordan and the Thank You. community for a live in-person event in Dallas, TX. A day of faith, vision, and gratitude — together.
+              </p>
+
+              <div className="inline-flex flex-col items-center lg:items-start gap-3">
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-2 bg-white text-black font-semibold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-sm"
+                >
+                  Join the Waitlist
+                  <ArrowRight size={15} />
+                </Link>
+                <p className="text-xs text-white/30">Members get first access.</p>
+              </div>
             </div>
 
           </div>
