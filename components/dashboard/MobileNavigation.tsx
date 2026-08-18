@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Image,
@@ -20,9 +20,6 @@ const navItems = [
 
 export default function MobileNavigation() {
   const pathname = usePathname();
-  const router = useRouter();
-
-  void router;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 md:hidden safe-area-pb">

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { Upload, Sparkles } from "lucide-react";
-import { mockUser, mockDreamDeclaration, mockVisionImages } from "@/lib/mock-data";
+import { mockDreamDeclaration } from "@/lib/mock-data";
+import { useUser } from "@/components/providers/UserProvider";
+import { getFirstName, getInitials } from "@/lib/types";
 import StreakCard from "@/components/dashboard/StreakCard";
 import MembershipCard from "@/components/dashboard/MembershipCard";
 import ZoomCard from "@/components/dashboard/ZoomCard";
@@ -11,11 +13,14 @@ import VisionGrid from "@/components/dashboard/VisionGrid";
 import NotesPreview from "@/components/dashboard/NotesPreview";
 
 export default function DashboardPage() {
+  const { user, profile } = useUser();
+  const firstName = getFirstName(profile, user?.email);
+  const initials = getInitials(profile, user?.email);
+  const avatarUrl = profile?.avatar_url;
+
   const [visionPrompt, setVisionPrompt] = useState("");
   const [declaration, setDeclaration] = useState(mockDreamDeclaration);
   const [generating, setGenerating] = useState(false);
-
-  void mockVisionImages;
 
   const handleGenerate = () => {
     if (!visionPrompt.trim()) return;
@@ -33,16 +38,16 @@ export default function DashboardPage() {
         {/* Welcome Card */}
         <div className="sm:col-span-2 xl:col-span-1 bg-white border border-gray-200 rounded-2xl p-6 flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 shrink-0">
-              <img
-                src={mockUser.avatar}
-                alt={mockUser.name}
-                className="w-full h-full object-cover"
-              />
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 shrink-0 bg-gray-100 flex items-center justify-center text-gray-500 font-semibold text-lg">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={firstName} className="w-full h-full object-cover" />
+              ) : (
+                <span>{initials}</span>
+              )}
             </div>
             <div>
               <p className="text-sm text-gray-500">Welcome back,</p>
-              <p className="text-xl font-bold">{mockUser.name}</p>
+              <p className="text-xl font-bold">{firstName}</p>
             </div>
           </div>
           <p className="text-sm text-gray-600 leading-relaxed">
@@ -101,10 +106,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Dream Declaration */}
-        <DreamDeclaration
-          declaration={declaration}
-          onSave={setDeclaration}
-        />
+        <DreamDeclaration declaration={declaration} onSave={setDeclaration} />
 
         {/* Vision Grid */}
         <div className="mt-6">

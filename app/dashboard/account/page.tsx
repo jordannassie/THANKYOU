@@ -1,35 +1,97 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, Crown, LogOut } from "lucide-react";
-import { mockUser, mockMembership, mockPreferences } from "@/lib/mock-data";
+import { Camera, Crown, LogOut, Loader2 } from "lucide-react";
+import { useUser } from "@/components/providers/UserProvider";
+import { getInitials, getFirstName } from "@/lib/types";
 import { signOut } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/client";
+import { mockMembership, mockPreferences } from "@/lib/mock-data";
+import { MEMBERSHIP_FEATURES, MEMBERSHIP_PRICE } from "@/lib/site-config";
 
 export default function AccountPage() {
   const router = useRouter();
-  const [name, setName] = useState(mockUser.name);
-  const [email, setEmail] = useState(mockUser.email);
+  const supabase = createClient();
+  const { user, profile } = useUser();
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const [name, setName] = useState(profile?.full_name ?? "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url ?? "");
+  const [uploading, setUploading] = useState(false);
   const [prefs, setPrefs] = useState(mockPreferences);
 
+  const initials = getInitials(profile, user?.email);
+  const firstName = getFirstName(profile, user?.email);
+  const email = user?.email ?? profile?.email ?? "";
+  const memberSince = profile?.created_at
+    ? new Date(profile.created_at).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      })
+    : "—";
+
   const handleSaveProfile = async () => {
+    if (!user) return;
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 600));
+    setSaveError("");
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: name.trim() })
+      .eq("id", user.id);
     setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    if (error) {
+      setSaveError(error.message);
+    } else {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    }
+  };
+
+  const handleAvatarClick = () => fileRef.current?.click();
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setUploading(true);
+
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      setUploading(false);
+      return;
+    }
+
+    const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+    const publicUrl = `${data.publicUrl}?t=${Date.now()}`;
+
+    await supabase
+      .from("profiles")
+      .update({ avatar_url: publicUrl })
+      .eq("id", user.id);
+
+    setAvatarUrl(publicUrl);
+    setUploading(false);
   };
 
   const togglePref = (key: keyof typeof mockPreferences) => {
     setPrefs((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleLogout = () => {
-    signOut();
+  const handleLogout = async () => {
+    await signOut();
     router.push("/login");
   };
+
+  const isPremium = profile?.membership_status === "premium";
 
   return (
     <div className="space-y-6 max-w-xl">
@@ -43,20 +105,32 @@ export default function AccountPage() {
         <h2 className="text-base font-semibold mb-5">Profile</h2>
         <div className="flex items-center gap-4 mb-6">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100">
-              <img
-                src={mockUser.avatar}
-                alt={mockUser.name}
-                className="w-full h-full object-cover"
-              />
+            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center text-gray-500 font-semibold text-lg">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={firstName} className="w-full h-full object-cover" />
+              ) : (
+                <span>{initials}</span>
+              )}
             </div>
-            <button className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors">
-              <Camera size={11} />
+            <button
+              onClick={handleAvatarClick}
+              disabled={uploading}
+              className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors disabled:opacity-50"
+              title="Change photo"
+            >
+              {uploading ? <Loader2 size={9} className="animate-spin" /> : <Camera size={11} />}
             </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className="hidden"
+              onChange={handleAvatarUpload}
+            />
           </div>
           <div>
-            <p className="text-sm font-semibold">{mockUser.name}</p>
-            <p className="text-xs text-gray-400">Member since {mockUser.joinedDate}</p>
+            <p className="text-sm font-semibold">{firstName}</p>
+            <p className="text-xs text-gray-400">Member since {memberSince}</p>
           </div>
         </div>
         <div className="space-y-4">
@@ -67,6 +141,7 @@ export default function AccountPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
+              placeholder="Your name"
             />
           </div>
           <div>
@@ -74,15 +149,21 @@ export default function AccountPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
+              readOnly
+              className="w-full border border-gray-100 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-gray-500 cursor-not-allowed"
+              title="Email is managed through Supabase Auth"
             />
+            <p className="text-xs text-gray-400 mt-1">Email changes are managed through account security.</p>
           </div>
+          {saveError && (
+            <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl">{saveError}</p>
+          )}
           <button
             onClick={handleSaveProfile}
             disabled={saving}
-            className="w-full bg-black text-white text-sm font-medium py-2.5 rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-50"
+            className="w-full bg-black text-white text-sm font-medium py-2.5 rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
+            {saving && <Loader2 size={14} className="animate-spin" />}
             {saving ? "Saving..." : saved ? "Saved!" : "Save Changes"}
           </button>
         </div>
@@ -95,23 +176,24 @@ export default function AccountPage() {
             <Crown size={15} className="text-white" />
           </div>
           <div>
-            <h2 className="text-base font-semibold">Premium Membership</h2>
-            <p className="text-sm text-gray-500">{mockMembership.price} · Active</p>
+            <h2 className="text-base font-semibold">
+              {isPremium ? "Premium Membership" : "Free Account"}
+            </h2>
+            <p className="text-sm text-gray-500">
+              {isPremium ? `${MEMBERSHIP_PRICE} · Active` : "Upgrade to unlock everything"}
+            </p>
           </div>
         </div>
         <ul className="space-y-1.5 mb-5">
-          {mockMembership.features.map((f) => (
+          {(isPremium ? MEMBERSHIP_FEATURES : mockMembership.features).map((f) => (
             <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="w-1.5 h-1.5 bg-black rounded-full shrink-0" />
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isPremium ? "bg-black" : "bg-gray-300"}`} />
               {f}
             </li>
           ))}
         </ul>
-        <p className="text-xs text-gray-400 mb-4">
-          Next billing date: {mockMembership.nextBillingDate}
-        </p>
         <button className="w-full border border-gray-200 text-sm font-medium py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
-          Manage Membership
+          {isPremium ? "Manage Membership" : "Upgrade to Premium"}
         </button>
       </section>
 
@@ -127,7 +209,7 @@ export default function AccountPage() {
           />
           <PreferenceToggle
             label="Weekly Call Reminders"
-            description="Get notified before your weekly Zoom call"
+            description="Get notified before your monthly live call"
             checked={prefs.weeklyCallReminders}
             onChange={() => togglePref("weeklyCallReminders")}
           />
@@ -140,7 +222,7 @@ export default function AccountPage() {
         </div>
       </section>
 
-      {/* Logout */}
+      {/* Account Actions */}
       <section className="bg-white border border-gray-200 rounded-2xl p-6">
         <h2 className="text-base font-semibold mb-4">Account</h2>
         <button

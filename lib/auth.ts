@@ -1,87 +1,91 @@
 /**
- * Mock authentication layer.
- * Replace these functions with Supabase Auth calls when backend is ready.
- * The UI should never directly access localStorage — always go through this module.
+ * Client-side auth helpers wrapping the Supabase browser client.
+ * Replace with direct Supabase calls if you prefer; these are thin wrappers.
+ * The server-side equivalent lives in lib/supabase/server.ts.
  */
 
-const MOCK_USER_KEY = "thankyou_mock_user";
-const DEMO_USER_KEY = "thankyou_demo_user";
+import { createClient } from "@/lib/supabase/client";
 
-export function signIn(email: string, _password: string): Promise<{ success: boolean; error?: string }> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (email) {
-        if (typeof window !== "undefined") {
-          localStorage.removeItem(DEMO_USER_KEY);
-          localStorage.setItem(MOCK_USER_KEY, JSON.stringify({ email, signedInAt: Date.now() }));
-        }
-        resolve({ success: true });
-      } else {
-        resolve({ success: false, error: "Invalid credentials" });
-      }
-    }, 600);
-  });
+function humaniseError(msg: string): string {
+  if (msg.includes("Invalid login credentials")) return "Incorrect email or password.";
+  if (msg.includes("Email not confirmed")) return "Please check your email to confirm your account.";
+  if (msg.includes("User already registered") || msg.includes("already been registered"))
+    return "An account with this email already exists.";
+  if (msg.includes("Password should be at least")) return "Password must be at least 6 characters.";
+  if (msg.includes("invalid email") || msg.includes("Unable to validate email"))
+    return "Please enter a valid email address.";
+  if (msg.includes("Email rate limit")) return "Too many attempts. Please try again later.";
+  return msg;
 }
 
-export function signUp(
+export async function signIn(
+  email: string,
+  password: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient();
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return { success: false, error: humaniseError(error.message) };
+  return { success: true };
+}
+
+export async function signUp(
   name: string,
   email: string,
-  _password: string
-): Promise<{ success: boolean; error?: string }> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (name && email) {
-        if (typeof window !== "undefined") {
-          localStorage.removeItem(DEMO_USER_KEY);
-          localStorage.setItem(MOCK_USER_KEY, JSON.stringify({ name, email, signedInAt: Date.now() }));
-        }
-        resolve({ success: true });
-      } else {
-        resolve({ success: false, error: "Please fill in all fields" });
-      }
-    }, 600);
+  password: string
+): Promise<{ success: boolean; error?: string; needsConfirmation?: boolean }> {
+  const supabase = createClient();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { full_name: name } },
   });
-}
-
-/**
- * Demo access — populates the dashboard with sample content immediately.
- * No email or password required.
- * Easy to remove when real auth is added: just delete this function and its call site.
- */
-export function signInAsDemo(): void {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(DEMO_USER_KEY, "true");
-    localStorage.setItem(
-      MOCK_USER_KEY,
-      JSON.stringify({ name: "Jordan", email: "demo@thankyou.app", isDemo: true, signedInAt: Date.now() })
-    );
+  if (error) return { success: false, error: humaniseError(error.message) };
+  // If session is null, email confirmation is required
+  if (!data.session) {
+    return { success: true, needsConfirmation: true };
   }
+  return { success: true };
 }
 
-export function isDemoUser(): boolean {
-  if (typeof window === "undefined") return false;
-  return localStorage.getItem(DEMO_USER_KEY) === "true";
+export async function signInWithGoogle(): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient();
+  const redirectTo =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/auth/callback`
+      : "/auth/callback";
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo },
+  });
+  if (error) return { success: false, error: humaniseError(error.message) };
+  return { success: true };
 }
 
-export function signOut(): void {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem(MOCK_USER_KEY);
-    localStorage.removeItem(DEMO_USER_KEY);
-  }
+export async function sendPasswordReset(
+  email: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient();
+  const redirectTo =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/auth/reset-password`
+      : "/auth/reset-password";
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) return { success: false, error: humaniseError(error.message) };
+  return { success: true };
 }
 
-export function isAuthenticated(): boolean {
-  if (typeof window === "undefined") return false;
-  return !!localStorage.getItem(MOCK_USER_KEY);
+export async function signOut(): Promise<void> {
+  const supabase = createClient();
+  await supabase.auth.signOut();
 }
 
-export function getCurrentUser(): { email?: string; name?: string; isDemo?: boolean } | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(MOCK_USER_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
+/** Client-side: use sparingly; prefer server-side getUser() for protected routes. */
+export async function getCurrentUser() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
 }

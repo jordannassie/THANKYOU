@@ -24,8 +24,8 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLogout = () => {
-    signOut();
+  const handleLogout = async () => {
+    await signOut();
     router.push("/login");
   };
 
