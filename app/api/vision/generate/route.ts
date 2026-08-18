@@ -20,7 +20,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 // ── Constants ────────────────────────────────────────────────
 
-const MODEL = "gpt-image-2";
+const MODEL = "gpt-image-1";
 const SIZE = "1024x1024" as const;
 const QUALITY = "medium" as const;
 const MAX_PROMPT_CHARS = 1000;
@@ -104,8 +104,9 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     console.error("[vision/generate] OpenAI error:", msg);
+    // Surface the real error so it's visible during development
     return NextResponse.json(
-      { error: "We couldn't create that image. Please try again." },
+      { error: `Image generation failed: ${msg}` },
       { status: 500 }
     );
   }
@@ -136,7 +137,7 @@ export async function POST(request: NextRequest) {
   if (uploadError) {
     console.error("[vision/generate] Storage upload error:", uploadError.message);
     return NextResponse.json(
-      { error: "Failed to save image. Please try again." },
+      { error: `Storage error: ${uploadError.message}` },
       { status: 500 }
     );
   }
@@ -160,10 +161,9 @@ export async function POST(request: NextRequest) {
 
   if (dbError) {
     console.error("[vision/generate] DB insert error:", dbError.message);
-    // Best-effort storage cleanup
     await adminClient.storage.from(STORAGE_BUCKET).remove([storagePath]);
     return NextResponse.json(
-      { error: "Failed to save image record. Please try again." },
+      { error: `Database error: ${dbError.message}` },
       { status: 500 }
     );
   }
