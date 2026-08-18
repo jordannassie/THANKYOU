@@ -9,11 +9,12 @@ const THETA = 0.35;
 const GLOBE_NDC_RADIUS = 0.8;
 
 const CITIES = [
-  { name: "Dallas, TX",   lat:  32.7767, lon:  -96.797 },
-  { name: "London, UK",   lat:  51.5074, lon:   -0.1278 },
-  { name: "Dubai, UAE",   lat:  25.2048, lon:   55.2708 },
-  { name: "Hong Kong",    lat:  22.3193, lon:  114.1694 },
-  { name: "Johannesburg", lat: -26.2041, lon:   28.0473 },
+  { name: "Dallas, TX",      lat:  32.7767, lon:  -96.797  },
+  { name: "Newport Beach",   lat:  33.6189, lon: -117.9289 },
+  { name: "London, UK",      lat:  51.5074, lon:   -0.1278 },
+  { name: "Dubai, UAE",      lat:  25.2048, lon:   55.2708 },
+  { name: "Hong Kong",       lat:  22.3193, lon:  114.1694 },
+  { name: "Johannesburg",    lat: -26.2041, lon:   28.0473 },
 ];
 
 /**
