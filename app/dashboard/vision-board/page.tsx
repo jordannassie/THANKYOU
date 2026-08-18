@@ -179,23 +179,42 @@ export default function VisionBoardPage() {
     setGenerateError("");
 
     try {
-      // Submit to FAL queue — returns in ~300 ms with a jobId
-      const res = await fetch("/api/vision/start", {
+      // Step 1: create job record in DB (~200 ms) — returns jobId + accessToken
+      const startRes = await fetch("/api/vision/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt.trim() }),
       });
 
-      const json = await res.json() as { jobId?: string; error?: string };
+      const startJson = await startRes.json() as {
+        jobId?: string;
+        accessToken?: string;
+        error?: string;
+      };
 
-      if (!res.ok || !json.jobId) {
-        setGenerateError(json.error ?? `Server error (${res.status}). Please try again.`);
+      if (!startRes.ok || !startJson.jobId) {
+        setGenerateError(startJson.error ?? `Server error (${startRes.status}). Please try again.`);
         setGenerating(false);
         return;
       }
 
-      // Start polling for the job result
-      setPollingJobId(json.jobId);
+      const { jobId, accessToken } = startJson;
+
+      // Step 2: kick off the Netlify Background Function (fire-and-forget)
+      // Job record already exists so polling finds it immediately.
+      fetch("/.netlify/functions/vision-generate-background", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken ?? ""}`,
+        },
+        body: JSON.stringify({ jobId, prompt: prompt.trim() }),
+      }).catch(() => {
+        // Ignore network errors — Netlify returns 202 before we can read a response
+      });
+
+      // Step 3: start polling
+      setPollingJobId(jobId);
     } catch (err) {
       setGenerateError(
         err instanceof Error ? err.message : "Network error — please try again."

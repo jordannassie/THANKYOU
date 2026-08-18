@@ -106,21 +106,39 @@ export default function DashboardPage() {
     setGenerateError("");
 
     try {
-      const res = await fetch("/api/vision/start", {
+      // Step 1: create job record in DB (~200 ms)
+      const startRes = await fetch("/api/vision/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: visionPrompt.trim() }),
       });
 
-      const json = await res.json() as { jobId?: string; error?: string };
+      const startJson = await startRes.json() as {
+        jobId?: string;
+        accessToken?: string;
+        error?: string;
+      };
 
-      if (!res.ok || !json.jobId) {
-        setGenerateError(json.error ?? `Server error (${res.status}). Please try again.`);
+      if (!startRes.ok || !startJson.jobId) {
+        setGenerateError(startJson.error ?? `Server error (${startRes.status}). Please try again.`);
         setGenerating(false);
         return;
       }
 
-      setPollingJobId(json.jobId);
+      const { jobId, accessToken } = startJson;
+
+      // Step 2: fire background function (fire-and-forget)
+      fetch("/.netlify/functions/vision-generate-background", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken ?? ""}`,
+        },
+        body: JSON.stringify({ jobId, prompt: visionPrompt.trim() }),
+      }).catch(() => {});
+
+      // Step 3: start polling
+      setPollingJobId(jobId);
     } catch (err) {
       setGenerateError(err instanceof Error ? err.message : "Network error — please try again.");
       setGenerating(false);
