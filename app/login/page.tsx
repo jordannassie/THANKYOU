@@ -3,12 +3,23 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { signIn, signUp, sendPasswordReset } from "@/lib/auth";
+import { signIn, signUp, sendPasswordReset, signInWithGoogle } from "@/lib/auth";
 import ZoomCountdownBar from "@/components/ZoomCountdownBar";
 import { BOOK_AMAZON_URL } from "@/lib/site-config";
 
 // Admin access code — change this to secure access
 const ADMIN_CODE = "1234";
+
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#4285F4" d="M47.52 24.56c0-1.61-.14-3.16-.41-4.64H24v8.78h13.19c-.57 3.01-2.29 5.56-4.88 7.27v6.04h7.9c4.62-4.26 7.31-10.53 7.31-17.45z"/>
+      <path fill="#34A853" d="M24 48c6.63 0 12.19-2.2 16.25-5.99l-7.9-6.04c-2.19 1.47-5 2.34-8.35 2.34-6.42 0-11.86-4.34-13.8-10.17H2.02v6.23C6.06 42.66 14.42 48 24 48z"/>
+      <path fill="#FBBC05" d="M10.2 28.14A14.47 14.47 0 0 1 9.6 24c0-1.44.25-2.84.6-4.14v-6.23H2.02A23.97 23.97 0 0 0 0 24c0 3.87.93 7.53 2.02 10.37l8.18-6.23z"/>
+      <path fill="#EA4335" d="M24 9.69c3.62 0 6.87 1.24 9.42 3.68l7.07-7.07C36.18 2.43 30.62 0 24 0 14.42 0 6.06 5.34 2.02 13.63l8.18 6.23C12.14 14.03 17.58 9.69 24 9.69z"/>
+    </svg>
+  );
+}
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -23,6 +34,7 @@ function LoginContent() {
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState(urlError ?? "");
   const [info, setInfo] = useState("");
 
@@ -39,6 +51,17 @@ function LoginContent() {
     } else {
       setAdminError("Incorrect code.");
     }
+  };
+
+  const handleGoogle = async () => {
+    setError("");
+    setGoogleLoading(true);
+    const result = await signInWithGoogle();
+    if (!result.success) {
+      setError(result.error ?? "Google sign-in failed.");
+      setGoogleLoading(false);
+    }
+    // On success Supabase redirects to /auth/callback — no manual navigation needed
   };
 
   const switchMode = (m: Mode) => {
@@ -235,6 +258,30 @@ function LoginContent() {
                 </button>
               )}
             </form>
+
+            {/* Google OAuth — shown on signin + signup only */}
+            {mode !== "forgot" && (
+              <>
+                <div className="flex items-center gap-3 mt-5">
+                  <div className="flex-1 h-px bg-gray-200" />
+                  <span className="text-xs text-gray-400">or</span>
+                  <div className="flex-1 h-px bg-gray-200" />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleGoogle}
+                  disabled={googleLoading || loading}
+                  className="mt-3 w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {googleLoading ? (
+                    <Loader2 size={16} className="animate-spin text-gray-400" />
+                  ) : (
+                    <GoogleIcon />
+                  )}
+                  Continue with Google
+                </button>
+              </>
+            )}
 
             {/* Mode switching */}
             <div className="mt-6 text-center text-sm text-gray-500">
