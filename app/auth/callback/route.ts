@@ -37,11 +37,17 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${requestUrl.origin}${next}`);
+      // Always redirect to /dashboard after successful OAuth
+      const redirectTo = next.startsWith("/") ? next : "/dashboard";
+      return NextResponse.redirect(`${requestUrl.origin}${redirectTo}`);
     }
+    // Redirect back with the specific Supabase error so it's visible
+    return NextResponse.redirect(
+      `${requestUrl.origin}/login?error=${encodeURIComponent(error.message)}`
+    );
   }
 
   return NextResponse.redirect(
-    `${requestUrl.origin}/login?error=${encodeURIComponent("Authentication failed. Please try again.")}`
+    `${requestUrl.origin}/login?error=${encodeURIComponent("No auth code received. Please try again.")}`
   );
 }

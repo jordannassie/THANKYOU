@@ -164,8 +164,33 @@ function LoginContent() {
               {mode === "forgot" && "Enter your email and we'll send you a reset link."}
             </p>
 
+            {/* Google OAuth — TOP, shown on signin + signup only */}
+            {mode !== "forgot" && (
+              <div className="mt-6">
+                <button
+                  type="button"
+                  onClick={handleGoogle}
+                  disabled={googleLoading || loading}
+                  className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {googleLoading ? (
+                    <Loader2 size={16} className="animate-spin text-gray-400" />
+                  ) : (
+                    <GoogleIcon />
+                  )}
+                  Continue with Google
+                </button>
+
+                <div className="flex items-center gap-3 mt-5">
+                  <div className="flex-1 h-px bg-gray-200" />
+                  <span className="text-xs text-gray-400">or continue with email</span>
+                  <div className="flex-1 h-px bg-gray-200" />
+                </div>
+              </div>
+            )}
+
             {/* Email form */}
-            <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+            <form onSubmit={handleSubmit} className="mt-4 space-y-4">
               {mode === "signup" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
@@ -258,30 +283,6 @@ function LoginContent() {
                 </button>
               )}
             </form>
-
-            {/* Google OAuth — shown on signin + signup only */}
-            {mode !== "forgot" && (
-              <>
-                <div className="flex items-center gap-3 mt-5">
-                  <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-xs text-gray-400">or</span>
-                  <div className="flex-1 h-px bg-gray-200" />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleGoogle}
-                  disabled={googleLoading || loading}
-                  className="mt-3 w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {googleLoading ? (
-                    <Loader2 size={16} className="animate-spin text-gray-400" />
-                  ) : (
-                    <GoogleIcon />
-                  )}
-                  Continue with Google
-                </button>
-              </>
-            )}
 
             {/* Mode switching */}
             <div className="mt-6 text-center text-sm text-gray-500">
