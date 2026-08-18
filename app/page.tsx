@@ -98,6 +98,20 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const countdown = useCountdown(NEXT_ZOOM_CALL_DATE);
 
+  // If Google OAuth redirected back to the home page instead of /auth/callback
+  // (happens when Google Cloud Console has the wrong redirect URI registered),
+  // forward the code to the correct callback route automatically.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code  = params.get("code");
+    const error = params.get("error");
+    if (code) {
+      window.location.replace(`/auth/callback?code=${encodeURIComponent(code)}`);
+    } else if (error) {
+      window.location.replace(`/login?error=${encodeURIComponent(params.get("error_description") ?? error)}`);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Global Zoom Countdown Bar */}

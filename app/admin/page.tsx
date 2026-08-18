@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { Users, UserCheck, Crown, ShieldCheck } from "lucide-react";
 
@@ -10,7 +10,7 @@ function daysAgoISO(days: number): string {
 }
 
 export default async function AdminPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: profiles } = await supabase.from("profiles").select("role, membership_status, created_at");
 
