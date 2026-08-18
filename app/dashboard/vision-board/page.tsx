@@ -51,6 +51,8 @@ export default function VisionBoardPage() {
   const [prompt, setPrompt] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState("");
+  // Background job polling
+  const [pollingJobId, setPollingJobId] = useState<string | null>(null);
 
   // Upload state
   const [uploading, setUploading] = useState(false);
@@ -84,46 +86,119 @@ export default function VisionBoardPage() {
     return () => { cancelled = true; };
   }, [supabase, refreshKey]);
 
+  // ── Background job polling ────────────────────────────────
+
+  useEffect(() => {
+    if (!pollingJobId || !generating) return;
+
+    let stopped = false;
+    // Timeout: stop polling after 5 minutes
+    const POLL_TIMEOUT = 5 * 60 * 1000;
+    const startedAt = Date.now();
+
+    const poll = async () => {
+      if (stopped) return;
+
+      if (Date.now() - startedAt > POLL_TIMEOUT) {
+        setGenerateError("Generation is taking too long. Please try again.");
+        setGenerating(false);
+        setPollingJobId(null);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/vision/job/${pollingJobId}`);
+        if (!res.ok) {
+          // Job not found yet (background function may not have written it yet)
+          setTimeout(poll, 3000);
+          return;
+        }
+        const job = await res.json() as {
+          status: string;
+          error_message?: string | null;
+        };
+
+        if (job.status === "completed") {
+          stopped = true;
+          setRefreshKey((k) => k + 1); // Re-fetch grid from Supabase
+          setPrompt("");
+          setShowGenerateModal(false);
+          setGenerating(false);
+          setPollingJobId(null);
+        } else if (job.status === "failed") {
+          stopped = true;
+          setGenerateError(
+            job.error_message ??
+              "Generation failed. Please try again."
+          );
+          setGenerating(false);
+          setPollingJobId(null);
+        } else {
+          // Still pending / processing — poll again in 3s
+          setTimeout(poll, 3000);
+        }
+      } catch {
+        // Network glitch — keep polling
+        if (!stopped) setTimeout(poll, 4000);
+      }
+    };
+
+    // Start first poll after a short delay to let the function spin up
+    const timer = setTimeout(poll, 3000);
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+    };
+  }, [pollingJobId, generating]);
+
   // ── Generate ─────────────────────────────────────────────
 
   const handleGenerate = async () => {
     if (!prompt.trim() || generating) return;
+    if (!user) {
+      setGenerateError("Please sign in to generate images.");
+      return;
+    }
+
     setGenerating(true);
     setGenerateError("");
 
     try {
-      const res = await fetch("/api/vision/generate", {
+      // Get the Supabase access token so the background function can auth
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+
+      if (!accessToken) {
+        setGenerateError("Session expired. Please sign in again.");
+        setGenerating(false);
+        return;
+      }
+
+      // Generate a job ID on the client so we know what to poll
+      const jobId = generateId();
+
+      // Fire the background function — it returns 202 immediately.
+      // We intentionally do NOT await a meaningful response body.
+      fetch("/.netlify/functions/vision-generate-background", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim() }),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ jobId, prompt: prompt.trim() }),
+      }).catch(() => {
+        // Ignore network errors — the job might still be running
       });
 
-      // Parse JSON safely — a timeout returns a non-JSON 502 page
-      let json: { error?: string; image?: VisionImage } = {};
-      try {
-        json = await res.json();
-      } catch {
-        setGenerateError(`Server error (${res.status}) — generation may have timed out. Please try again.`);
-        setGenerating(false);
-        return;
-      }
-
-      if (!res.ok) {
-        setGenerateError(json.error ?? `Error ${res.status} — please try again.`);
-        setGenerating(false);
-        return;
-      }
-
-      // Optimistic prepend — no full re-fetch needed
-      const newImage = json.image as VisionImage;
-      setImages((prev) => [newImage, ...prev]);
-      setPrompt("");
-      setShowGenerateModal(false);
+      // Start polling for the job result
+      setPollingJobId(jobId);
+      // generating stays true; polling effect will clear it when done
     } catch (err) {
-      setGenerateError(err instanceof Error ? err.message : "Network error — please try again.");
+      setGenerateError(
+        err instanceof Error ? err.message : "Network error — please try again."
+      );
+      setGenerating(false);
     }
-
-    setGenerating(false);
   };
 
   // ── Upload ───────────────────────────────────────────────
@@ -405,15 +480,26 @@ export default function VisionBoardPage() {
                 <p className="text-xs text-gray-400 mt-1 text-right">{prompt.length}/1000</p>
 
                 {generateError && (
-                  <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl mt-3">
-                    {generateError}
-                  </p>
+                  <div className="mt-3 bg-red-50 border border-red-100 px-4 py-3 rounded-xl">
+                    <p className="text-sm text-red-600">{generateError}</p>
+                    <button
+                      onClick={() => setGenerateError("")}
+                      className="mt-2 text-xs text-red-500 underline"
+                    >
+                      Dismiss and try again
+                    </button>
+                  </div>
                 )}
 
                 {generating && (
-                  <div className="mt-3 flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl">
-                    <Loader2 size={15} className="animate-spin shrink-0" />
-                    Creating your vision… this may take 20–40 seconds.
+                  <div className="mt-3 bg-gray-50 px-4 py-4 rounded-xl space-y-1">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                      <Loader2 size={15} className="animate-spin shrink-0" />
+                      Creating your vision…
+                    </div>
+                    <p className="text-xs text-gray-500 leading-relaxed pl-5">
+                      This can take up to a minute or two. You can keep this window open while we create your image.
+                    </p>
                   </div>
                 )}
 

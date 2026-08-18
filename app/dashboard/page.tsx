@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Upload, Sparkles, Loader2 } from "lucide-react";
 import { mockDreamDeclaration } from "@/lib/mock-data";
 import { useUser } from "@/components/providers/UserProvider";
 import { getFirstName, getInitials } from "@/lib/types";
+import { createClient } from "@/lib/supabase/client";
 import StreakCard from "@/components/dashboard/StreakCard";
 import MembershipCard from "@/components/dashboard/MembershipCard";
 import ZoomCard from "@/components/dashboard/ZoomCard";
@@ -12,8 +13,14 @@ import DreamDeclaration from "@/components/dashboard/DreamDeclaration";
 import VisionGrid from "@/components/dashboard/VisionGrid";
 import NotesPreview from "@/components/dashboard/NotesPreview";
 
+function generateId(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
 export default function DashboardPage() {
   const { user, profile } = useUser();
+  const supabase = useMemo(() => createClient(), []);
   const firstName = getFirstName(profile, user?.email);
   const initials = getInitials(profile, user?.email);
   const avatarUrl = profile?.avatar_url;
@@ -23,34 +30,86 @@ export default function DashboardPage() {
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState("");
   const [gridRefreshKey, setGridRefreshKey] = useState(0);
+  const [pollingJobId, setPollingJobId] = useState<string | null>(null);
+
+  // ── Poll for job completion ─────────────────────────────────────────
+  useEffect(() => {
+    if (!pollingJobId || !generating) return;
+
+    let stopped = false;
+    const POLL_TIMEOUT = 5 * 60 * 1000;
+    const startedAt = Date.now();
+
+    const poll = async () => {
+      if (stopped) return;
+
+      if (Date.now() - startedAt > POLL_TIMEOUT) {
+        setGenerateError("Generation is taking too long. Please try again.");
+        setGenerating(false);
+        setPollingJobId(null);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/vision/job/${pollingJobId}`);
+        if (!res.ok) { setTimeout(poll, 3000); return; }
+
+        const job = await res.json() as { status: string; error_message?: string | null };
+
+        if (job.status === "completed") {
+          stopped = true;
+          setGridRefreshKey((k) => k + 1);
+          setVisionPrompt("");
+          setGenerating(false);
+          setPollingJobId(null);
+        } else if (job.status === "failed") {
+          stopped = true;
+          setGenerateError(job.error_message ?? "Generation failed. Please try again.");
+          setGenerating(false);
+          setPollingJobId(null);
+        } else {
+          setTimeout(poll, 3000);
+        }
+      } catch {
+        if (!stopped) setTimeout(poll, 4000);
+      }
+    };
+
+    const timer = setTimeout(poll, 3000);
+    return () => { stopped = true; clearTimeout(timer); };
+  }, [pollingJobId, generating]);
 
   const handleGenerate = async () => {
-    if (!visionPrompt.trim() || generating) return;
+    if (!visionPrompt.trim() || generating || !user) return;
     setGenerating(true);
     setGenerateError("");
 
     try {
-      const res = await fetch("/api/vision/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: visionPrompt.trim() }),
-      });
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
 
-      let json: { error?: string } = {};
-      try { json = await res.json(); } catch { /* timeout — non-JSON response */ }
-
-      if (!res.ok) {
-        setGenerateError(json.error ?? `Server error (${res.status}) — generation may have timed out. Try again.`);
-      } else {
-        setVisionPrompt("");
-        // Increment key so VisionGrid re-fetches
-        setGridRefreshKey((k) => k + 1);
+      if (!accessToken) {
+        setGenerateError("Session expired. Please sign in again.");
+        setGenerating(false);
+        return;
       }
+
+      const jobId = generateId();
+
+      fetch("/.netlify/functions/vision-generate-background", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ jobId, prompt: visionPrompt.trim() }),
+      }).catch(() => {});
+
+      setPollingJobId(jobId);
     } catch (err) {
       setGenerateError(err instanceof Error ? err.message : "Network error — please try again.");
+      setGenerating(false);
     }
-
-    setGenerating(false);
   };
 
   return (
@@ -136,15 +195,26 @@ export default function DashboardPage() {
         </div>
 
         {generateError && (
-          <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl mb-4">
-            {generateError}
-          </p>
+          <div className="bg-red-50 border border-red-100 px-4 py-3 rounded-xl mb-4">
+            <p className="text-sm text-red-600">{generateError}</p>
+            <button
+              onClick={() => setGenerateError("")}
+              className="mt-1 text-xs text-red-500 underline"
+            >
+              Dismiss and try again
+            </button>
+          </div>
         )}
 
         {generating && (
-          <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl mb-4">
-            <Loader2 size={15} className="animate-spin shrink-0" />
-            Creating your vision… this may take 20–40 seconds.
+          <div className="bg-gray-50 px-4 py-4 rounded-xl mb-4 space-y-1">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+              <Loader2 size={15} className="animate-spin shrink-0" />
+              Creating your vision…
+            </div>
+            <p className="text-xs text-gray-500 leading-relaxed pl-5">
+              This can take up to a minute or two. You can keep this window open while we create your image.
+            </p>
           </div>
         )}
 
