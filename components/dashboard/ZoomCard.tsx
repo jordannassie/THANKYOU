@@ -15,7 +15,11 @@ export default function ZoomCard() {
     <div className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gray-500">Next Zoom Call</span>
-        <Video size={16} className="text-gray-400" />
+        <img
+          src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Zoom-Logo.png"
+          alt="Zoom"
+          className="h-5 w-auto object-contain"
+        />
       </div>
       <div className="flex items-end gap-3">
         {units.map((unit, i) => (
