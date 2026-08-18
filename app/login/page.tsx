@@ -3,22 +3,14 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { signIn, signUp, signInWithGoogle, sendPasswordReset } from "@/lib/auth";
+import { signIn, signUp, sendPasswordReset } from "@/lib/auth";
 import ZoomCountdownBar from "@/components/ZoomCountdownBar";
 import { BOOK_AMAZON_URL } from "@/lib/site-config";
 
-type Mode = "signin" | "signup" | "forgot";
+// Admin access code — change this to secure access
+const ADMIN_CODE = "1234";
 
-function GoogleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" className="shrink-0">
-      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-    </svg>
-  );
-}
+type Mode = "signin" | "signup" | "forgot";
 
 function LoginContent() {
   const router = useRouter();
@@ -31,9 +23,23 @@ function LoginContent() {
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState(urlError ?? "");
   const [info, setInfo] = useState("");
+
+  // Admin access
+  const [showAdminCode, setShowAdminCode] = useState(false);
+  const [adminCode, setAdminCode] = useState("");
+  const [adminError, setAdminError] = useState("");
+
+  const handleAdminAccess = () => {
+    if (adminCode === ADMIN_CODE) {
+      // Set cookie readable by server proxy
+      document.cookie = `ty_admin_code=${ADMIN_CODE}; path=/; max-age=86400; SameSite=Lax`;
+      router.push("/admin");
+    } else {
+      setAdminError("Incorrect code.");
+    }
+  };
 
   const switchMode = (m: Mode) => {
     setMode(m);
@@ -82,16 +88,6 @@ function LoginContent() {
         router.push("/dashboard");
       }
     }
-  };
-
-  const handleGoogle = async () => {
-    setGoogleLoading(true);
-    const result = await signInWithGoogle();
-    if (!result.success) {
-      setError(result.error ?? "Google sign-in failed.");
-      setGoogleLoading(false);
-    }
-    // On success, Google OAuth redirects — no further action needed here.
   };
 
   return (
@@ -145,32 +141,8 @@ function LoginContent() {
               {mode === "forgot" && "Enter your email and we'll send you a reset link."}
             </p>
 
-            {/* Google button — sign in / sign up only */}
-            {mode !== "forgot" && (
-              <button
-                onClick={handleGoogle}
-                disabled={googleLoading}
-                className="mt-8 w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
-              >
-                {googleLoading ? (
-                  <Loader2 size={16} className="animate-spin text-gray-400" />
-                ) : (
-                  <GoogleIcon />
-                )}
-                Continue with Google
-              </button>
-            )}
-
-            {mode !== "forgot" && (
-              <div className="flex items-center gap-3 my-5">
-                <div className="flex-1 h-px bg-gray-100" />
-                <span className="text-xs text-gray-400">or</span>
-                <div className="flex-1 h-px bg-gray-100" />
-              </div>
-            )}
-
             {/* Email form */}
-            <form onSubmit={handleSubmit} className={`${mode === "forgot" ? "mt-8" : ""} space-y-4`}>
+            <form onSubmit={handleSubmit} className="mt-8 space-y-4">
               {mode === "signup" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
@@ -283,6 +255,48 @@ function LoginContent() {
                 </button>
               )}
             </div>
+
+            {/* ── Admin Access ── */}
+            <div className="mt-10 pt-6 border-t border-gray-100">
+              {!showAdminCode ? (
+                <button
+                  onClick={() => { setShowAdminCode(true); setAdminError(""); }}
+                  className="w-full text-xs text-gray-300 hover:text-gray-500 transition-colors py-1"
+                >
+                  Staff access
+                </button>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="password"
+                      value={adminCode}
+                      onChange={(e) => { setAdminCode(e.target.value); setAdminError(""); }}
+                      onKeyDown={(e) => e.key === "Enter" && handleAdminAccess()}
+                      placeholder="Access code"
+                      className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
+                      autoFocus
+                    />
+                    <button
+                      onClick={handleAdminAccess}
+                      className="bg-black text-white text-xs font-medium px-4 py-2 rounded-xl hover:bg-gray-900 transition-colors"
+                    >
+                      Enter
+                    </button>
+                  </div>
+                  {adminError && (
+                    <p className="text-xs text-red-500 text-center">{adminError}</p>
+                  )}
+                  <button
+                    onClick={() => { setShowAdminCode(false); setAdminCode(""); setAdminError(""); }}
+                    className="w-full text-xs text-gray-300 hover:text-gray-500 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+
           </div>
         </div>
       </div>

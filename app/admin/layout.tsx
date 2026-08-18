@@ -1,32 +1,43 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/lib/types";
 import { LayoutDashboard, Users, LogOut } from "lucide-react";
+import ExitAdminButton from "./ExitAdminButton";
+
+const ADMIN_CODE = "1234";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
+  // Check for staff access code first (bypasses Supabase auth)
+  const cookieStore = await cookies();
+  const adminCode = cookieStore.get("ty_admin_code")?.value;
+  const hasAdminCode = adminCode === ADMIN_CODE;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!hasAdminCode) {
+    // Fall back to Supabase profile-based admin check
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+    if (!user) redirect("/login");
 
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
 
-  const profile = profileData as Profile | null;
+    const profile = profileData as Profile | null;
 
-  if (!profile || profile.role !== "admin") {
-    redirect("/dashboard");
+    if (!profile || profile.role !== "admin") {
+      redirect("/dashboard");
+    }
   }
 
   return (
@@ -41,7 +52,7 @@ export default async function AdminLayout({
           <AdminLink href="/admin" icon={<LayoutDashboard size={16} />} label="Overview" />
           <AdminLink href="/admin/users" icon={<Users size={16} />} label="Users" />
         </nav>
-        <div className="px-3 pb-5">
+        <div className="px-3 pb-5 space-y-1">
           <Link
             href="/dashboard"
             className="flex items-center gap-2 px-3 py-2 text-xs text-white/50 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
@@ -49,6 +60,7 @@ export default async function AdminLayout({
             <LogOut size={14} />
             Back to Dashboard
           </Link>
+          <ExitAdminButton />
         </div>
       </aside>
 
@@ -59,6 +71,7 @@ export default async function AdminLayout({
     </div>
   );
 }
+
 
 function AdminLink({
   href,

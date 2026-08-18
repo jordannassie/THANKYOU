@@ -47,12 +47,18 @@ export async function proxy(request: NextRequest) {
 
   // ── Protected: /admin/* ──────────────────────────────────────────────────
   if (pathname.startsWith("/admin")) {
+    // Allow access via admin code cookie (staff shortcut)
+    const adminCode = request.cookies.get("ty_admin_code")?.value;
+    if (adminCode === "1234") {
+      return supabaseResponse;
+    }
+
     if (!user) {
       const url = request.nextUrl.clone();
       url.pathname = "/login";
       return NextResponse.redirect(url);
     }
-    // Check admin role server-side
+    // Check admin role server-side for real Supabase accounts
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
