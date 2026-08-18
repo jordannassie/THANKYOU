@@ -11,6 +11,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { signOut } from "@/lib/auth";
+import { useUser } from "@/components/providers/UserProvider";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -23,9 +24,14 @@ const navItems = [
 export default function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { isDemo } = useUser();
 
   const handleLogout = async () => {
-    await signOut();
+    if (isDemo) {
+      document.cookie = "ty_demo_user=; path=/; max-age=0";
+    } else {
+      await signOut();
+    }
     router.push("/login");
   };
 

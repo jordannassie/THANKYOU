@@ -38,6 +38,11 @@ export async function proxy(request: NextRequest) {
 
   // ── Protected: /dashboard/* ──────────────────────────────────────────────
   if (pathname.startsWith("/dashboard")) {
+    // Allow demo access via cookie
+    const demoUser = request.cookies.get("ty_demo_user")?.value;
+    if (demoUser === "true") {
+      return supabaseResponse;
+    }
     if (!user) {
       const url = request.nextUrl.clone();
       url.pathname = "/login";

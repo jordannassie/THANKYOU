@@ -391,6 +391,7 @@ export default function LandingPage() {
                 { label: "Sign In", href: "/login" },
                 { label: "Terms", href: "#" },
                 { label: "Privacy", href: "#" },
+                { label: "Admin", href: "/admin" },
               ].map((link) => (
                 <a key={link.label} href={link.href} className="text-sm text-gray-400 hover:text-black transition-colors">
                   {link.label}

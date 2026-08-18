@@ -220,6 +220,20 @@ function LoginContent() {
                 {mode === "signup" && "Create My Account"}
                 {mode === "forgot" && "Send Reset Link"}
               </button>
+
+              {/* Demo button — sign in mode only */}
+              {mode === "signin" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    document.cookie = "ty_demo_user=true; path=/; max-age=86400; SameSite=Lax";
+                    router.push("/dashboard");
+                  }}
+                  className="w-full border border-gray-200 text-gray-600 font-medium py-3 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm"
+                >
+                  View Demo Dashboard
+                </button>
+              )}
             </form>
 
             {/* Mode switching */}
