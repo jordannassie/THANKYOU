@@ -36,6 +36,9 @@ Do not add text, quotes, captions, logos or watermarks unless the user specifica
 User's vision:
 `;
 
+// Allow up to 60 s — image generation takes 20–40 s
+export const maxDuration = 60;
+
 // ── Route handler ────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {

@@ -98,10 +98,18 @@ export default function VisionBoardPage() {
         body: JSON.stringify({ prompt: prompt.trim() }),
       });
 
-      const json = await res.json();
+      // Parse JSON safely — a timeout returns a non-JSON 502 page
+      let json: { error?: string; image?: VisionImage } = {};
+      try {
+        json = await res.json();
+      } catch {
+        setGenerateError(`Server error (${res.status}) — generation may have timed out. Please try again.`);
+        setGenerating(false);
+        return;
+      }
 
       if (!res.ok) {
-        setGenerateError(json.error ?? "We couldn't create that image. Please try again.");
+        setGenerateError(json.error ?? `Error ${res.status} — please try again.`);
         setGenerating(false);
         return;
       }
@@ -111,8 +119,8 @@ export default function VisionBoardPage() {
       setImages((prev) => [newImage, ...prev]);
       setPrompt("");
       setShowGenerateModal(false);
-    } catch {
-      setGenerateError("We couldn't create that image. Please try again.");
+    } catch (err) {
+      setGenerateError(err instanceof Error ? err.message : "Network error — please try again.");
     }
 
     setGenerating(false);

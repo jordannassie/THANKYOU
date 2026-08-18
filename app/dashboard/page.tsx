@@ -36,17 +36,18 @@ export default function DashboardPage() {
         body: JSON.stringify({ prompt: visionPrompt.trim() }),
       });
 
-      const json = await res.json();
+      let json: { error?: string } = {};
+      try { json = await res.json(); } catch { /* timeout — non-JSON response */ }
 
       if (!res.ok) {
-        setGenerateError(json.error ?? "We couldn't create that image. Please try again.");
+        setGenerateError(json.error ?? `Server error (${res.status}) — generation may have timed out. Try again.`);
       } else {
         setVisionPrompt("");
         // Increment key so VisionGrid re-fetches
         setGridRefreshKey((k) => k + 1);
       }
-    } catch {
-      setGenerateError("We couldn't create that image. Please try again.");
+    } catch (err) {
+      setGenerateError(err instanceof Error ? err.message : "Network error — please try again.");
     }
 
     setGenerating(false);
