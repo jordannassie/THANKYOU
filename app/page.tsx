@@ -46,8 +46,12 @@ export default function LandingPage() {
         {/* Navigation — sits below the bar */}
         <nav className="bg-white/95 backdrop-blur-sm border-b border-gray-100">
           <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
-            <Link href="/" className="text-xl font-bold tracking-tight">
-              Thank You.
+            <Link href="/">
+              <img
+                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Logo.png"
+                alt="Thank You."
+                className="h-16 w-auto object-contain"
+              />
             </Link>
 
             {/* Desktop nav */}
