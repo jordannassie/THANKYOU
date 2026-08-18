@@ -173,7 +173,7 @@ export default function LandingPage() {
           </p>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
             See the future you are<br className="hidden sm:block" />
-            <HeroWord /> God for.
+            <HeroWord /> God for...
           </h1>
           <p className="text-lg text-gray-500 mt-8 max-w-xl mx-auto leading-relaxed">
             Create your vision. Write it down. Give thanks. Keep believing. Watch what God does.
