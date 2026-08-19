@@ -673,6 +673,12 @@ export default function LandingPage() {
       {/* Statement of Faith */}
       <section className="py-20 px-5 bg-black text-white">
         <div className="max-w-3xl mx-auto text-center">
+          <div className="flex items-center justify-center w-14 h-14 rounded-full border border-white/20 mx-auto mb-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+          </div>
           <p className="text-xs font-semibold tracking-widest uppercase text-white/40 mb-6">Statement of Faith</p>
           <div className="space-y-5 text-white/80 text-base leading-relaxed">
             <p>We believe in <span className="text-white font-semibold">one God — Father, Son, and Holy Spirit.</span></p>
