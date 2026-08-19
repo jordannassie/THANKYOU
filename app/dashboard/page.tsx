@@ -23,19 +23,39 @@ export default function DashboardPage() {
   const avatarUrl = profile?.avatar_url;
 
   const [visionPrompt, setVisionPrompt] = useState("");
-  const [declaration, setDeclaration] = useState(mockDreamDeclaration);
 
-  // Load persisted declaration from localStorage once user is known
+  // Initialise from Supabase profile (already fetched server-side).
+  // Falls back to localStorage for backwards-compat, then to the default.
+  const defaultDeclaration =
+    profile?.dream_declaration ||
+    (typeof window !== "undefined" && user?.id
+      ? localStorage.getItem(`ty-dream-${user.id}`) ?? ""
+      : "") ||
+    mockDreamDeclaration;
+
+  const [declaration, setDeclaration] = useState(defaultDeclaration);
+
+  // When the profile loads (async after hydration), sync the value.
   useEffect(() => {
-    if (!user?.id) return;
-    const saved = localStorage.getItem(`ty-dream-${user.id}`);
-    if (saved) setDeclaration(saved);
-  }, [user?.id]);
+    if (profile?.dream_declaration) {
+      setDeclaration(profile.dream_declaration);
+    }
+  }, [profile?.dream_declaration]);
 
-  const handleSaveDeclaration = (value: string) => {
+  const handleSaveDeclaration = async (value: string) => {
     setDeclaration(value);
+
+    // Always persist in localStorage as a fast local backup
     if (user?.id) {
-      localStorage.setItem(`ty-dream-${user.id}`, value);
+      try { localStorage.setItem(`ty-dream-${user.id}`, value); } catch (_) {}
+    }
+
+    // Save to Supabase so it persists across devices / sessions
+    if (user?.id) {
+      await supabase
+        .from("profiles")
+        .update({ dream_declaration: value })
+        .eq("id", user.id);
     }
   };
   const [generating, setGenerating] = useState(false);

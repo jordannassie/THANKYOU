@@ -17,6 +17,7 @@ const DEMO_PROFILE: Profile = {
   membership_status: "premium",
   invite_code: "demo1234",
   country_code: "US",
+  dream_declaration: null,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 };

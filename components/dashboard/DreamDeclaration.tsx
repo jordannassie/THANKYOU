@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Crown } from "lucide-react";
 
 interface Props {
@@ -12,16 +12,27 @@ export default function DreamDeclaration({ declaration, onSave }: Props) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(declaration);
   const [current, setCurrent] = useState(declaration);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
+  // Sync when the parent passes a freshly-loaded value (e.g. after Supabase profile loads)
+  useEffect(() => {
+    if (!editing) {
+      setValue(declaration);
+      setCurrent(declaration);
+    }
+  }, [declaration, editing]);
+
+  const handleSave = async () => {
+    setSaving(true);
     setCurrent(value);
     setEditing(false);
-    onSave?.(value);
+    await onSave?.(value);
+    setSaving(false);
   };
 
   return (
     <div className="relative bg-white border border-gray-200 rounded-2xl overflow-hidden">
-      {/* Decorative lines */}
+      {/* Decorative top line */}
       <div className="absolute top-6 left-8 right-8 flex items-center gap-3 pointer-events-none">
         <div className="h-px flex-1 bg-gray-200" />
         <Crown size={14} className="text-gray-400 shrink-0" />
@@ -51,9 +62,13 @@ export default function DreamDeclaration({ declaration, onSave }: Props) {
               </button>
               <button
                 onClick={handleSave}
-                className="px-6 py-2 bg-black text-white text-sm font-medium rounded-xl hover:bg-gray-900 transition-colors"
+                disabled={saving}
+                className="px-6 py-2 bg-black text-white text-sm font-medium rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-60 flex items-center gap-2"
               >
-                Save
+                {saving && (
+                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
+                )}
+                {saving ? "Saving…" : "Save"}
               </button>
             </div>
           </div>

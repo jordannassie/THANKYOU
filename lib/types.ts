@@ -7,6 +7,7 @@ export interface Profile {
   membership_status: "free" | "premium";
   invite_code: string | null;
   country_code: string | null;
+  dream_declaration: string | null;
   created_at: string;
   updated_at: string;
 }
