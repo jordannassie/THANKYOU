@@ -27,6 +27,7 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY                  ?? "";
 const STORAGE_BUCKET = "STORAGE";
 
 const SYSTEM_PREFIX =
+  "Shot on iPhone 13 Pro camera — ultra-sharp, natural lighting, true-to-life colors, cinematic depth of field. " +
   "Create an inspiring, aspirational vision-board image. " +
   "Make it visually beautiful, realistic, premium, uplifting and photographic " +
   "unless the user requests another style. " +
