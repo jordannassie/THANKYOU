@@ -11,6 +11,7 @@ import {
   ZoomIn,
   ChevronLeft,
   ChevronRight,
+  GripVertical,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/components/providers/UserProvider";
@@ -31,6 +32,21 @@ function generateId(): string {
     return crypto.randomUUID();
   }
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+function reorderImages(
+  items: VisionImage[],
+  fromId: string,
+  toId: string
+): VisionImage[] {
+  const fromIndex = items.findIndex((i) => i.id === fromId);
+  const toIndex = items.findIndex((i) => i.id === toId);
+  if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return items;
+
+  const next = [...items];
+  const [moved] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, moved);
+  return next;
 }
 
 // ── Component ────────────────────────────────────────────────
@@ -66,6 +82,11 @@ export default function VisionBoardPage() {
   // Viewer
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
+  // Drag reorder
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
+
   // ── Fetch images (inline in effect to satisfy react-hooks/purity) ─────
 
   useEffect(() => {
@@ -75,6 +96,7 @@ export default function VisionBoardPage() {
       const { data } = await supabase
         .from("vision_board_images")
         .select("*")
+        .order("sort_order", { ascending: true })
         .order("created_at", { ascending: false });
 
       if (!cancelled) {
@@ -280,6 +302,11 @@ export default function VisionBoardPage() {
       data: { publicUrl },
     } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath);
 
+    const nextSortOrder =
+      images.length > 0
+        ? Math.min(...images.map((i) => i.sort_order ?? 0)) - 1
+        : 0;
+
     const { data: record, error: dbErr } = await supabase
       .from("vision_board_images")
       .insert({
@@ -288,6 +315,7 @@ export default function VisionBoardPage() {
         storage_path: storagePath,
         prompt: null,
         source: "uploaded",
+        sort_order: nextSortOrder,
       })
       .select()
       .single();
@@ -331,6 +359,66 @@ export default function VisionBoardPage() {
     setConfirmDeleteId(null);
   };
 
+  // ── Drag reorder ─────────────────────────────────────────
+
+  const persistOrder = useCallback(
+    async (ordered: VisionImage[]) => {
+      if (isDemo || !user) return;
+
+      setSavingOrder(true);
+      const withOrder = ordered.map((img, index) => ({ ...img, sort_order: index }));
+      setImages(withOrder);
+
+      const results = await Promise.all(
+        withOrder.map((img) =>
+          supabase
+            .from("vision_board_images")
+            .update({ sort_order: img.sort_order })
+            .eq("id", img.id)
+        )
+      );
+
+      const failed = results.find((r) => r.error);
+      if (failed?.error) {
+        console.error("[vision-board] reorder save error:", failed.error);
+        setRefreshKey((k) => k + 1);
+      }
+      setSavingOrder(false);
+    },
+    [isDemo, user, supabase]
+  );
+
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    if (isDemo) return;
+    setDraggedId(id);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", id);
+  };
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === id) return;
+    setDragOverId(id);
+  };
+
+  const handleDrop = (targetId: string) => {
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      setDragOverId(null);
+      return;
+    }
+
+    const reordered = reorderImages(images, draggedId, targetId);
+    setDraggedId(null);
+    setDragOverId(null);
+    void persistOrder(reordered);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedId(null);
+    setDragOverId(null);
+  };
+
   // ── Viewer navigation ────────────────────────────────────
 
   const viewerImage = viewerIndex !== null ? images[viewerIndex] : null;
@@ -364,7 +452,15 @@ export default function VisionBoardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">My Vision Board</h1>
-          <p className="text-gray-500 text-sm mt-1">See the future you are believing God for.</p>
+          <p className="text-gray-500 text-sm mt-1">
+            See the future you are believing God for.
+            {images.length > 1 && !isDemo && (
+              <span className="text-gray-400"> · Drag images to reorder</span>
+            )}
+            {savingOrder && (
+              <span className="text-gray-400"> · Saving order…</span>
+            )}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -417,13 +513,38 @@ export default function VisionBoardPage() {
             {images.map((img, index) => (
               <div
                 key={img.id}
-                className="aspect-square rounded-xl overflow-hidden bg-gray-100 relative group"
+                draggable={!isDemo}
+                onDragStart={(e) => handleDragStart(e, img.id)}
+                onDragOver={(e) => handleDragOver(e, img.id)}
+                onDragLeave={() => {
+                  if (dragOverId === img.id) setDragOverId(null);
+                }}
+                onDrop={() => handleDrop(img.id)}
+                onDragEnd={handleDragEnd}
+                className={[
+                  "aspect-square rounded-xl overflow-hidden bg-gray-100 relative group",
+                  !isDemo ? "cursor-grab active:cursor-grabbing" : "",
+                  draggedId === img.id ? "opacity-50 scale-[0.98]" : "",
+                  dragOverId === img.id && draggedId !== img.id
+                    ? "ring-2 ring-orange-400 ring-offset-2"
+                    : "",
+                ].join(" ")}
               >
+                {/* Drag handle hint */}
+                {!isDemo && (
+                  <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-7 h-7 bg-black/40 backdrop-blur-sm rounded-lg flex items-center justify-center text-white">
+                      <GripVertical size={14} />
+                    </div>
+                  </div>
+                )}
+
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={img.image_url}
                   alt={img.prompt ?? "Vision Board image"}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  draggable={false}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 pointer-events-none"
                 />
 
                 {/* Hover overlay */}

@@ -28,6 +28,7 @@ export default function VisionGrid({ refreshKey = 0, limit = 10 }: Props) {
       const { data } = await supabase
         .from("vision_board_images")
         .select("*")
+        .order("sort_order", { ascending: true })
         .order("created_at", { ascending: false })
         .limit(limit);
 
