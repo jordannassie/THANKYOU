@@ -63,7 +63,7 @@ import {
 
 const features = [
   { icon: Image, title: "Vision Board", description: "Build a visual representation of what you're believing for." },
-  { icon: Crown, title: "Dream Declaration", description: "Put your future into words and see it every day." },
+  { icon: Crown, title: "Thank You Declaration", description: "Put your future into words and see it every day." },
   { icon: Flame, title: "Daily Thank You", description: "Build a daily habit of gratitude and faith." },
   { icon: BookOpen, title: "Notes", description: "Write prayers, gratitude, reflections, and action steps." },
   { icon: Users, title: "Community", description: "Grow alongside others who are believing for their future." },
@@ -246,89 +246,25 @@ export default function LandingPage() {
       {/* Dashboard Preview */}
       <section className="px-5 pb-24">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-gray-50 border border-gray-200 rounded-3xl overflow-hidden shadow-2xl shadow-gray-200/60">
-            <div className="bg-black text-white px-6 py-4 flex items-center gap-3">
+          <div className="rounded-3xl overflow-hidden shadow-2xl shadow-gray-300/50 border border-gray-200">
+            {/* Browser chrome bar */}
+            <div className="bg-black text-white px-6 py-3.5 flex items-center gap-3">
               <div className="flex gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-white/20" />
                 <div className="w-3 h-3 rounded-full bg-white/20" />
                 <div className="w-3 h-3 rounded-full bg-white/20" />
               </div>
               <div className="flex-1 bg-white/10 rounded-lg px-3 py-1 text-xs text-white/50 text-center">
-                thankyou.app/dashboard
+                thankyoupower.netlify.app/dashboard
               </div>
             </div>
-            <div className="flex min-h-[500px]">
-              <div className="hidden sm:flex w-44 bg-black text-white flex-col px-4 py-5 shrink-0">
-                <p className="text-sm font-bold mb-1">Thank You.</p>
-                <p className="text-[9px] text-white/40 mb-5">Receive. Believe. Thank.</p>
-                {["Dashboard", "Vision Board", "Notes", "Community", "Account"].map((item, i) => (
-                  <div key={item} className={`text-xs px-2 py-2 rounded-lg mb-0.5 ${i === 0 ? "bg-white text-black font-medium" : "text-white/50"}`}>
-                    {item}
-                  </div>
-                ))}
-              </div>
-              <div className="flex-1 p-5 overflow-hidden">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-                  <div className="bg-white rounded-xl p-4 border border-gray-100 col-span-2 lg:col-span-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="User" className="w-full h-full object-cover" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-gray-400">Welcome back,</p>
-                        <p className="text-xs font-bold">Jordan</p>
-                      </div>
-                    </div>
-                    <p className="text-[9px] text-gray-400 leading-relaxed">Nothing is impossible with God.</p>
-                    <p className="text-[9px] font-semibold">What a man believes, he becomes.</p>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border border-gray-100">
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <div className="w-5 h-5 bg-black rounded-full flex items-center justify-center"><Flame size={10} className="text-white" /></div>
-                      <span className="text-[9px] text-gray-500">Daily Streak</span>
-                    </div>
-                    <p className="text-xl font-bold">47 days</p>
-                    <p className="text-[9px] text-gray-400 mt-1">God honors your faithfulness.</p>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border border-gray-100">
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <div className="w-5 h-5 bg-black rounded-full flex items-center justify-center"><Crown size={9} className="text-white" /></div>
-                      <span className="text-[9px] text-gray-500">Premium</span>
-                    </div>
-                    <p className="text-xl font-bold">{MEMBERSHIP_PRICE}</p>
-                    <p className="text-[9px] text-gray-400 mt-1">Monthly Live Calls</p>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border border-gray-100">
-                    <p className="text-[9px] text-gray-500 mb-2">Next Live Call</p>
-                    <div className="flex gap-1">
-                      {["22", "05", "18"].map((v, i) => (
-                        <div key={i} className="text-center">
-                          <p className="text-sm font-bold">{v}</p>
-                          <p className="text-[7px] text-gray-400">{["D", "H", "M"][i]}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4 text-center">
-                  <p className="text-[9px] uppercase tracking-widest text-gray-400 mb-2">Dream Declaration</p>
-                  <p className="font-serif text-base md:text-lg font-medium">Thank you God I will be a billionaire</p>
-                </div>
-                <div className="grid grid-cols-5 gap-1.5">
-                  {[
-                    "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=200&h=150&fit=crop",
-                    "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=200&h=150&fit=crop",
-                    "https://images.unsplash.com/photo-1439130490301-25e322d88054?w=200&h=150&fit=crop",
-                    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200&h=150&fit=crop",
-                    "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=200&h=150&fit=crop",
-                  ].map((url, i) => (
-                    <div key={i} className="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                      <img src={url} alt="" className="w-full h-full object-cover" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            {/* Real screenshot */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Dash.png"
+              alt="Thank You dashboard"
+              className="w-full block"
+            />
           </div>
         </div>
       </section>

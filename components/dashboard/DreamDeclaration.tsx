@@ -41,7 +41,7 @@ export default function DreamDeclaration({ declaration, onSave }: Props) {
 
       <div className="px-8 pt-14 pb-10 text-center relative">
         <p className="text-xs uppercase tracking-[0.3em] text-gray-400 font-medium mb-4">
-          Dream Declaration
+          Thank You Declaration
         </p>
 
         {editing ? (

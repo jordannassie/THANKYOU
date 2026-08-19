@@ -214,7 +214,7 @@ export default function DashboardPage() {
         <ZoomCard />
       </div>
 
-      {/* Dream Declaration — sits above vision tools */}
+      {/* Thank You Declaration — sits above vision tools */}
       <DreamDeclaration declaration={declaration} onSave={handleSaveDeclaration} />
 
       {/* My Vision Section */}
