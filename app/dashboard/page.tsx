@@ -253,7 +253,7 @@ export default function DashboardPage() {
             disabled={generating || !visionPrompt.trim()}
             className="inline-flex items-center gap-1.5 text-white text-sm font-semibold px-5 py-3 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             style={generating ? {
-              background: "linear-gradient(90deg, #7c3aed, #2563eb, #06b6d4, #7c3aed)",
+              background: "linear-gradient(90deg, #38bdf8, #06b6d4, #22d3ee, #38bdf8)",
               backgroundSize: "300% 100%",
               animation: "vb-sweep 2.4s linear infinite",
             } : { background: "#000" }}

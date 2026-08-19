@@ -77,3 +77,9 @@ input:checked + .toggle-slider {
 input:checked + .toggle-slider:before {
   transform: translateX(20px);
 }
+
+/* Vision board generate button shimmer */
+@keyframes vb-sweep {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}

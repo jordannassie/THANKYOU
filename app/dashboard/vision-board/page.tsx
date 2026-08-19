@@ -540,7 +540,7 @@ export default function VisionBoardPage() {
                     disabled={generating || prompt.trim().length < 3}
                     className="flex-1 text-white text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all disabled:cursor-not-allowed disabled:opacity-40"
                     style={generating ? {
-                      background: "linear-gradient(90deg, #7c3aed, #2563eb, #06b6d4, #7c3aed)",
+                      background: "linear-gradient(90deg, #38bdf8, #06b6d4, #22d3ee, #38bdf8)",
                       backgroundSize: "300% 100%",
                       animation: "vb-sweep 2.4s linear infinite",
                     } : { background: "#000" }}
