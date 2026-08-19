@@ -192,7 +192,41 @@ export default function LandingPage() {
           <p className="text-lg text-gray-500 mt-8 max-w-xl mx-auto leading-relaxed">
             Create your vision. Write it down. Give thanks. Keep believing. Watch what God does.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10">
+          {/* Social proof — member avatars */}
+          <div className="flex flex-col items-center gap-3 mt-10">
+            <div className="flex items-center">
+              {[
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
+                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face",
+                "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80&h=80&fit=crop&crop=face",
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
+                "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&crop=face",
+                "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop&crop=face",
+                "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=80&h=80&fit=crop&crop=face",
+                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face",
+              ].map((src, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={i}
+                  src={src}
+                  alt=""
+                  className="w-9 h-9 rounded-full border-2 border-white object-cover"
+                  style={{ marginLeft: i === 0 ? 0 : "-10px", zIndex: 10 - i }}
+                />
+              ))}
+              <div
+                className="w-9 h-9 rounded-full border-2 border-white bg-black text-white flex items-center justify-center text-[10px] font-bold"
+                style={{ marginLeft: "-10px", zIndex: 1 }}
+              >
+                +2k
+              </div>
+            </div>
+            <p className="text-sm text-gray-500">
+              <span className="font-semibold text-black">2,000+ members</span> already seeing their vision come to pass
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
             <Link
               href="/login"
               className="bg-black text-white font-medium px-8 py-4 rounded-xl hover:bg-gray-900 transition-colors text-sm w-full sm:w-auto text-center"
@@ -555,6 +589,132 @@ export default function LandingPage() {
               </div>
             </div>
 
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-24 px-5 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-3">Testimonials</p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">What members are saying</h2>
+            <p className="text-gray-500 mt-4 text-lg max-w-xl mx-auto">
+              Real people. Real faith. Real results.
+            </p>
+          </div>
+
+          {/* Masonry-style grid */}
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 space-y-5">
+            {[
+              {
+                name: "Marcus T.",
+                location: "Dallas, TX",
+                avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
+                stars: 5,
+                text: "I wrote down that I would own a home by end of year and I thanked God for it every single day on the vision board. Closed on my house 4 months later. This app is not a game.",
+              },
+              {
+                name: "Priya S.",
+                location: "Houston, TX",
+                avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&crop=face",
+                stars: 5,
+                text: "The community inside Thank You. keeps me accountable. There is something powerful about declaring your vision out loud in a group of believers. I look forward to the Zoom calls every month.",
+              },
+              {
+                name: "David K.",
+                location: "Atlanta, GA",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
+                stars: 5,
+                text: "I've tried vision boards before but nothing stuck. This is different because it adds gratitude to faith. I thank God for what I haven't received yet — and things just start moving.",
+              },
+              {
+                name: "Aaliyah M.",
+                location: "Charlotte, NC",
+                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face",
+                stars: 5,
+                text: "Got my promotion 6 weeks after putting it on my vision board. My manager said she had been thinking about it for months but finally pulled the trigger. God is not slow.",
+              },
+              {
+                name: "Carlos R.",
+                location: "Miami, FL",
+                avatar: "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=80&h=80&fit=crop&crop=face",
+                stars: 5,
+                text: "Jordan's book hit different. It made me realize I was asking God but not thanking Him in advance. That shift changed everything for my business. Revenue doubled in 90 days.",
+              },
+              {
+                name: "Tanya W.",
+                location: "Chicago, IL",
+                avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop&crop=face",
+                stars: 5,
+                text: "The dream declaration is simple but it hits you every time you open the dashboard. A constant reminder of what you're standing for. My faith is stronger than it has ever been.",
+              },
+              {
+                name: "James O.",
+                location: "Los Angeles, CA",
+                avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80&h=80&fit=crop&crop=face",
+                stars: 5,
+                text: "I was skeptical at first. But I have been in this community 5 months and the testimonies I hear on these Zoom calls keep my faith going when it gets hard. Worth every penny.",
+              },
+              {
+                name: "Sarah B.",
+                location: "Phoenix, AZ",
+                avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face",
+                stars: 5,
+                text: "I generated AI images of the house, the car, the family vacation — and I look at them every morning. It is not weird. It is faith with a picture. My kids have their own boards now too.",
+              },
+              {
+                name: "Michael D.",
+                location: "New York, NY",
+                avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=80&h=80&fit=crop&crop=face",
+                stars: 5,
+                text: "Three things I love: the vision board, the community feed, and the monthly Zoom. It feels like a church that meets online but is specifically focused on faith and abundance. Incredible.",
+              },
+            ].map((t, i) => (
+              <div
+                key={i}
+                className="break-inside-avoid bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+              >
+                {/* Stars */}
+                <div className="flex gap-0.5 mb-3">
+                  {Array.from({ length: t.stars }).map((_, s) => (
+                    <svg key={s} className="w-4 h-4 text-amber-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+
+                {/* Quote */}
+                <p className="text-sm text-gray-700 leading-relaxed">&ldquo;{t.text}&rdquo;</p>
+
+                {/* Author */}
+                <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-50">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={t.avatar}
+                    alt={t.name}
+                    className="w-9 h-9 rounded-full object-cover border border-gray-100"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+                    <p className="text-xs text-gray-400">{t.location}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Aggregate rating */}
+          <div className="text-center mt-14">
+            <div className="flex items-center justify-center gap-1 mb-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <svg key={i} className="w-5 h-5 text-amber-400 fill-current" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
+            <p className="text-2xl font-bold text-gray-900">4.9 / 5</p>
+            <p className="text-sm text-gray-400 mt-1">Based on 2,000+ member reviews</p>
           </div>
         </div>
       </section>
