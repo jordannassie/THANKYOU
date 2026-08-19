@@ -116,47 +116,83 @@ export const handler: Handler = async (event: HandlerEvent) => {
 
   // ── Call OpenAI gpt-image-2 ────────────────────────────────────────────
   console.log(`[vision-bg] Job ${jobId}: job loaded`);
-  console.log(`[vision-bg] Job ${jobId}: OpenAI request started`);
-  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
   let imageBuffer: Buffer;
+
   try {
+    const openaiStart = Date.now();
+    console.log(`[vision-bg] Job ${jobId}: OpenAI request started`);
+
     const result = await openai.images.generate({
-      model:   "gpt-image-2",
-      prompt:  SYSTEM_PREFIX + prompt,
-      size:    "1024x1024",
-      quality: "medium",
-      n:       1,
+      model:         "gpt-image-2",
+      prompt:        SYSTEM_PREFIX + prompt,
+      size:          "1024x1024",
+      quality:       "medium",
+      output_format: "jpeg",
+      n:             1,
     });
 
-    console.log(`[vision-bg] Job ${jobId}: OpenAI request completed`);
+    const openaiMs = Date.now() - openaiStart;
+    console.log(`[vision-bg] Job ${jobId}: OpenAI request completed in ${openaiMs}ms`);
+
+    // Inspect what the SDK returned
+    const dataLen = result.data?.length ?? 0;
+    console.log(`[vision-bg] Job ${jobId}: result.data length = ${dataLen}`);
 
     const imageData = result.data?.[0];
-    if (!imageData) throw new Error("OpenAI returned no image data");
-
-    if (imageData.b64_json) {
-      imageBuffer = Buffer.from(imageData.b64_json, "base64");
-    } else if (imageData.url) {
-      console.log(`[vision-bg] Job ${jobId}: downloading from OpenAI CDN`);
-      const r = await fetch(imageData.url);
-      if (!r.ok) throw new Error(`URL download failed: ${r.status}`);
-      imageBuffer = Buffer.from(await r.arrayBuffer());
-    } else {
-      throw new Error("OpenAI returned neither b64_json nor url");
+    if (!imageData) {
+      throw new Error(
+        `OpenAI returned no image data (data array length: ${dataLen})`
+      );
     }
 
-    console.log(`[vision-bg] Job ${jobId}: image downloaded (${imageBuffer.length} bytes)`);
+    const hasB64  = !!imageData.b64_json;
+    const hasUrl  = !!imageData.url;
+    console.log(`[vision-bg] Job ${jobId}: image data — b64_json: ${hasB64}, url: ${hasUrl}`);
+
+    if (imageData.b64_json) {
+      console.log(`[vision-bg] Job ${jobId}: Image base64 received (${imageData.b64_json.length} chars)`);
+      imageBuffer = Buffer.from(imageData.b64_json, "base64");
+      console.log(`[vision-bg] Job ${jobId}: Image converted to buffer (${imageBuffer.length} bytes)`);
+    } else if (imageData.url) {
+      console.log(`[vision-bg] Job ${jobId}: Image URL received — downloading`);
+      const r = await fetch(imageData.url);
+      if (!r.ok) throw new Error(`URL download failed: ${r.status} ${r.statusText}`);
+      imageBuffer = Buffer.from(await r.arrayBuffer());
+      console.log(`[vision-bg] Job ${jobId}: Image converted to buffer (${imageBuffer.length} bytes)`);
+    } else {
+      throw new Error("OpenAI returned neither b64_json nor url in data[0]");
+    }
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "OpenAI generation failed";
-    await failJob(jobId, msg);
-    return { statusCode: 500, body: msg };
+    // Log the full error for diagnosis
+    const name    = err instanceof Error ? err.name    : "UnknownError";
+    const message = err instanceof Error ? err.message : String(err);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const status  = (err as any)?.status ?? (err as any)?.statusCode ?? "n/a";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const code    = (err as any)?.error?.code ?? (err as any)?.code ?? "n/a";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const type    = (err as any)?.error?.type ?? "n/a";
+    const stack   = err instanceof Error ? (err.stack ?? "no stack") : "no stack";
+
+    console.error(`[vision-bg] Job ${jobId}: OpenAI ERROR`);
+    console.error(`  name:    ${name}`);
+    console.error(`  message: ${message}`);
+    console.error(`  status:  ${status}`);
+    console.error(`  code:    ${code}`);
+    console.error(`  type:    ${type}`);
+    console.error(`  stack:   ${stack}`);
+
+    await failJob(jobId, `OpenAI error (${status}): ${message}`);
+    return { statusCode: 500, body: message };
   }
 
   // ── Upload to Supabase Storage ──────────────────────────────────────────
   const imageId     = randomUUID();
   const storagePath = `vision-board/${job.user_id}/generated/${imageId}.jpg`;
 
-  console.log(`[vision-bg] Job ${jobId}: uploading to ${STORAGE_BUCKET}/${storagePath}`);
+  console.log(`[vision-bg] Job ${jobId}: Supabase upload started → ${STORAGE_BUCKET}/${storagePath}`);
 
   try {
     const { error: uploadErr } = await db.storage
@@ -166,6 +202,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     if (uploadErr) throw new Error(`Storage upload: ${uploadErr.message}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Upload failed";
+    console.error(`[vision-bg] Job ${jobId}: upload error: ${msg}`);
     await failJob(jobId, msg);
     return { statusCode: 500, body: msg };
   }
@@ -183,6 +220,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
   });
 
   if (insertErr) {
+    console.error(`[vision-bg] Job ${jobId}: vision_board_images insert error: ${insertErr.message}`);
     await failJob(jobId, `DB insert: ${insertErr.message}`);
     return { statusCode: 500, body: insertErr.message };
   }
@@ -193,8 +231,10 @@ export const handler: Handler = async (event: HandlerEvent) => {
     .update({ status: "completed", image_path: storagePath, updated_at: new Date().toISOString() })
     .eq("id", jobId);
 
-  if (updateErr) console.error(`[vision-bg] Job ${jobId} complete-update error:`, updateErr.message);
+  if (updateErr) {
+    console.error(`[vision-bg] Job ${jobId}: complete-update error: ${updateErr.message}`);
+  }
 
-  console.log(`[vision-bg] Job ${jobId}: job completed ✓`);
+  console.log(`[vision-bg] Job ${jobId}: job marked completed ✓`);
   return { statusCode: 200, body: "OK" };
 };
