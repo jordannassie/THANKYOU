@@ -18,6 +18,7 @@ import type { Handler, HandlerEvent } from "@netlify/functions";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { randomUUID } from "crypto";
+import ws from "ws";
 
 // ── Environment ─────────────────────────────────────────────────────────
 const SUPABASE_URL   = process.env.NEXT_PUBLIC_SUPABASE_URL        ?? "";
@@ -33,10 +34,16 @@ const SYSTEM_PREFIX =
   "User's vision: ";
 
 // ── Supabase admin client ────────────────────────────────────────────────
+// @supabase/supabase-js 2.112+ requires Node 22+ for native WebSocket.
+// Netlify Functions run Node 20, so we supply the `ws` package as the
+// Realtime transport. We never actually use Realtime — this only prevents
+// the constructor crash.
 function adminDB() {
   if (!SUPABASE_URL || !SERVICE_KEY) return null;
   return createSupabaseClient(SUPABASE_URL, SERVICE_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    realtime: { transport: ws as any },
   });
 }
 
@@ -73,6 +80,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     return { statusCode: 400, body: "Missing jobId or prompt" };
   }
 
+  console.log(`[vision-bg] Node version: ${process.version}`);
   console.log(`[vision-bg] START — Job ${jobId}`);
 
   // ── Validate environment ────────────────────────────────────────────────
@@ -107,7 +115,8 @@ export const handler: Handler = async (event: HandlerEvent) => {
   }
 
   // ── Call OpenAI gpt-image-2 ────────────────────────────────────────────
-  console.log(`[vision-bg] Job ${jobId}: calling OpenAI gpt-image-2`);
+  console.log(`[vision-bg] Job ${jobId}: job loaded`);
+  console.log(`[vision-bg] Job ${jobId}: OpenAI request started`);
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
   let imageBuffer: Buffer;
@@ -120,7 +129,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
       n:       1,
     });
 
-    console.log(`[vision-bg] Job ${jobId}: OpenAI responded`);
+    console.log(`[vision-bg] Job ${jobId}: OpenAI request completed`);
 
     const imageData = result.data?.[0];
     if (!imageData) throw new Error("OpenAI returned no image data");
@@ -162,7 +171,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
   }
 
   const { data: { publicUrl } } = db.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath);
-  console.log(`[vision-bg] Job ${jobId}: uploaded → ${publicUrl}`);
+  console.log(`[vision-bg] Job ${jobId}: Supabase upload completed → ${publicUrl}`);
 
   // ── Insert vision_board_images ──────────────────────────────────────────
   const { error: insertErr } = await db.from("vision_board_images").insert({
@@ -186,6 +195,6 @@ export const handler: Handler = async (event: HandlerEvent) => {
 
   if (updateErr) console.error(`[vision-bg] Job ${jobId} complete-update error:`, updateErr.message);
 
-  console.log(`[vision-bg] Job ${jobId}: COMPLETE ✓`);
+  console.log(`[vision-bg] Job ${jobId}: job completed ✓`);
   return { statusCode: 200, body: "OK" };
 };
