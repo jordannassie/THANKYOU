@@ -5,6 +5,8 @@ export interface Profile {
   avatar_url: string | null;
   role: "user" | "admin";
   membership_status: "free" | "premium";
+  invite_code: string | null;
+  country_code: string | null;
   created_at: string;
   updated_at: string;
 }

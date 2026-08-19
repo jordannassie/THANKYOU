@@ -7,6 +7,7 @@ import {
   Image,
   BookOpen,
   Users,
+  UserPlus,
   User,
   LogOut,
 } from "lucide-react";
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/dashboard/vision-board", label: "Vision Board", icon: Image },
   { href: "/dashboard/notes", label: "Notes", icon: BookOpen },
   { href: "/dashboard/community", label: "Community", icon: Users },
+  { href: "/dashboard/invite", label: "Invite", icon: UserPlus },
   { href: "/dashboard/account", label: "Account", icon: User },
 ];
 

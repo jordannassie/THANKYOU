@@ -15,6 +15,8 @@ const DEMO_PROFILE: Profile = {
   avatar_url: null,
   role: "user",
   membership_status: "premium",
+  invite_code: "demo1234",
+  country_code: "US",
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 };

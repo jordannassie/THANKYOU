@@ -35,15 +35,47 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      // Always redirect to /dashboard after successful OAuth
+    const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && sessionData?.user) {
+      const userId = sessionData.user.id;
+
+      // ── Referral attribution ───────────────────────────────────
+      // Check for a pending referral code in the cookie.
+      const refCookie = cookieStore.get("ty_ref_code");
+      const refCode = refCookie?.value;
+
+      if (refCode) {
+        try {
+          // Fire-and-forget: attribute the referral server-side.
+          // Use the internal key (first 32 chars of service role key) to authenticate.
+          const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+          await fetch(`${requestUrl.origin}/api/invite/attribute`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-internal-key": serviceKey.slice(0, 32),
+            },
+            body: JSON.stringify({
+              invited_user_id: userId,
+              invite_code: decodeURIComponent(refCode),
+            }),
+          });
+        } catch (e) {
+          // Non-fatal: log and continue
+          console.error("[callback] referral attribution error:", e);
+        }
+
+        // Clear the referral cookie regardless
+        cookieStore.set("ty_ref_code", "", { path: "/", maxAge: 0 });
+      }
+
+      // Always redirect to /dashboard after successful auth
       const redirectTo = next.startsWith("/") ? next : "/dashboard";
       return NextResponse.redirect(`${requestUrl.origin}${redirectTo}`);
     }
-    // Redirect back with the specific Supabase error so it's visible
+
     return NextResponse.redirect(
-      `${requestUrl.origin}/login?error=${encodeURIComponent(error.message)}`
+      `${requestUrl.origin}/login?error=${encodeURIComponent(error?.message ?? "Auth failed")}`
     );
   }
 
