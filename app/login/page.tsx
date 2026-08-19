@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { signIn, signUp, sendPasswordReset, signInWithGoogle } from "@/lib/auth";
@@ -37,6 +37,17 @@ function LoginContent() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState(urlError ?? "");
   const [info, setInfo] = useState("");
+
+  // Strip the ?error param from the URL immediately so a page refresh
+  // doesn't re-show a stale error from a previous auth attempt.
+  useEffect(() => {
+    if (urlError) {
+      router.replace("/login");
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Clear error as soon as the user starts interacting
+  const clearError = () => { if (error) setError(""); };
 
   // Admin access
   const [showAdminCode, setShowAdminCode] = useState(false);
@@ -224,7 +235,8 @@ function LoginContent() {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); clearError(); }}
+                  onFocus={clearError}
                   required
                   placeholder="your@email.com"
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400"
@@ -249,7 +261,8 @@ function LoginContent() {
                     <input
                       type={showPass ? "text" : "password"}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => { setPassword(e.target.value); clearError(); }}
+                      onFocus={clearError}
                       required
                       placeholder="••••••••"
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400"
