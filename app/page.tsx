@@ -255,7 +255,7 @@ export default function LandingPage() {
                 <div className="w-3 h-3 rounded-full bg-white/20" />
               </div>
               <div className="flex-1 bg-white/10 rounded-lg px-3 py-1 text-xs text-white/50 text-center">
-                thankyoupower.netlify.app/dashboard
+                thankyouway.com/dashboard
               </div>
             </div>
             {/* Real screenshot */}
