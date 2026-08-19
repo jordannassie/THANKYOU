@@ -623,7 +623,7 @@ export default function LandingPage() {
             <p>We believe salvation is a <span className="text-gray-900 font-semibold">gift of God&apos;s grace</span>, received through faith in Jesus Christ.</p>
             <p>We believe in the <span className="text-gray-900 font-semibold">power of prayer, the work of the Holy Spirit, and the hope of eternal life with God.</span></p>
           </div>
-          <p className="mt-10 text-2xl font-serif font-semibold text-gray-900 tracking-wide italic">Jesus is Lord.</p>
+          <p className="mt-10 text-2xl font-serif font-semibold text-gray-900 tracking-wide italic">Jesus is King.</p>
           <div className="mt-8 flex items-center justify-center gap-4">
             <div className="h-px w-16 bg-gray-300" />
             <span className="text-gray-400 text-xs">✦</span>
