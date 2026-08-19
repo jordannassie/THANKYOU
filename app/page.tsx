@@ -738,6 +738,26 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Statement of Faith */}
+      <section className="py-20 px-5 bg-black text-white">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-xs font-semibold tracking-widest uppercase text-white/40 mb-6">Statement of Faith</p>
+          <div className="space-y-5 text-white/80 text-base leading-relaxed">
+            <p>We believe in <span className="text-white font-semibold">one God — Father, Son, and Holy Spirit.</span></p>
+            <p>We believe <span className="text-white font-semibold">Jesus Christ is the Son of God</span>, who died for our sins, rose from the dead, and is the only way to salvation.</p>
+            <p>We believe the <span className="text-white font-semibold">Bible is the inspired Word of God</span> and the foundation for our faith and life.</p>
+            <p>We believe salvation is a <span className="text-white font-semibold">gift of God&apos;s grace</span>, received through faith in Jesus Christ.</p>
+            <p>We believe in the <span className="text-white font-semibold">power of prayer, the work of the Holy Spirit, and the hope of eternal life with God.</span></p>
+          </div>
+          <p className="mt-10 text-2xl font-serif font-semibold text-white tracking-wide italic">Jesus is Lord.</p>
+          <div className="mt-8 flex items-center justify-center gap-4">
+            <div className="h-px w-16 bg-white/20" />
+            <span className="text-white/30 text-xs">✦</span>
+            <div className="h-px w-16 bg-white/20" />
+          </div>
+        </div>
+      </section>
+
       {/* Jordan Nassie — About the Author */}
       <section className="py-24 px-5 bg-gray-50 overflow-hidden">
         <div className="max-w-5xl mx-auto">
