@@ -1,11 +1,11 @@
-export interface Confession {
+export interface Affirmation {
   id: string;
-  confession_text: string;
+  affirmation_text: string;
   scripture_reference: string;
   sort_order: number;
 }
 
-export interface ConfessionRow extends Confession {
+export interface AffirmationRow extends Affirmation {
   user_id?: string;
   created_at?: string;
   updated_at?: string;

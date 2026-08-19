@@ -12,7 +12,7 @@ import ZoomCard from "@/components/dashboard/ZoomCard";
 import DreamDeclaration from "@/components/dashboard/DreamDeclaration";
 import VisionGrid from "@/components/dashboard/VisionGrid";
 import NotesPreview from "@/components/dashboard/NotesPreview";
-import DailyConfessions from "@/components/dashboard/DailyConfessions";
+import DailyAffirmations from "@/components/dashboard/DailyAffirmations";
 import VisionLoadingBar from "@/components/dashboard/VisionLoadingBar";
 
 
@@ -286,9 +286,9 @@ export default function DashboardPage() {
         <VisionGrid refreshKey={gridRefreshKey} />
       </section>
 
-      {/* Daily Confessions */}
+      {/* Daily Affirmations */}
       <section>
-        <DailyConfessions />
+        <DailyAffirmations />
       </section>
 
       {/* Notes Preview */}
