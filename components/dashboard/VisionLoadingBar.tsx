@@ -89,7 +89,7 @@ export default function VisionLoadingBar() {
                 Creating your vision…
               </p>
               <p className="text-sm text-gray-400 mt-1 leading-relaxed">
-                AI is painting your vision — this usually takes 30–90 seconds.
+                AI is generating your vision image — this usually takes 30–90 seconds.
                 Keep this window open.
               </p>
 
