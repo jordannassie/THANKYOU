@@ -50,9 +50,8 @@ function HeroWord() {
   );
 }
 import {
-  BOOK_TITLE,
-  BOOK_SUBTITLE,
-  BOOK_PRICE,
+  BOOKS,
+  AMAZON_LOGO_URL,
   BOOK_AMAZON_URL,
   MEMBERSHIP_PRICE,
   MEMBERSHIP_FEATURES,
@@ -318,64 +317,82 @@ export default function LandingPage() {
       {/* Book Section */}
       <section id="book" className="py-24 px-5 bg-gray-50">
         <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
-            {/* Book Cover */}
-            <div className="flex justify-center md:justify-end">
-              <div className="relative">
-                <img
-                  src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Booksmall.png"
-                  alt="365 Thank You. by Jordan Nassie"
-                  className="w-56 md:w-64 rounded-2xl shadow-2xl shadow-gray-400/30 object-cover"
-                />
-                <div className="absolute -bottom-2 -right-2 w-56 md:w-64 h-full bg-gray-200 rounded-2xl -z-10" />
-              </div>
-            </div>
+          <div className="text-center mb-14">
+            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-gray-400 mb-4">The Books</p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+              Start with the books
+            </h2>
+            <p className="text-gray-500 mt-4 max-w-xl mx-auto">
+              Begin the journey with gratitude and daily devotion — then continue inside Thank You.
+            </p>
+          </div>
 
-            {/* Book Info */}
-            <div>
-              <p className="text-xs font-semibold tracking-[0.25em] uppercase text-gray-400 mb-4">The Book</p>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight mb-4">
-                {BOOK_TITLE}
-              </h2>
-              <p className="text-gray-500 leading-relaxed text-lg mb-6">
-                {BOOK_SUBTITLE}
-              </p>
-              <p className="text-3xl font-bold mb-8">{BOOK_PRICE}</p>
-
-              <a
-                href={BOOK_AMAZON_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-black text-white font-medium px-7 py-4 rounded-xl hover:bg-gray-900 transition-colors text-sm"
+          <div className="grid md:grid-cols-2 gap-10 md:gap-12">
+            {BOOKS.map((book) => (
+              <div
+                key={book.id}
+                className="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col"
               >
-                <img
-                  src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Amazon_logo.svg.webp"
-                  alt="Amazon"
-                  className="h-4 w-auto brightness-0 invert"
-                />
-                Get the Book on Amazon
-              </a>
-
-              <p className="text-sm text-gray-400 mt-5 leading-relaxed">
-                Start with the book. Continue the journey inside Thank You.
-              </p>
-
-              {/* Product ladder */}
-              <div className="mt-8 pt-8 border-t border-gray-200 grid grid-cols-2 gap-4">
-                <div className="p-4 bg-white rounded-xl border border-gray-200">
-                  <p className="text-xs font-semibold tracking-wider uppercase text-gray-400 mb-1">The Book</p>
-                  <p className="text-xl font-bold mb-1">{BOOK_PRICE}</p>
-                  <p className="text-xs text-gray-500">Begin the journey.</p>
-                </div>
-                <div className="p-4 bg-black text-white rounded-xl">
-                  <p className="text-xs font-semibold tracking-wider uppercase text-white/40 mb-1">Membership</p>
-                  <div className="mb-1 flex items-baseline gap-1.5">
-                    <span className="text-xs text-white/30 line-through">$299</span>
-                    <span className="text-xl font-bold">{MEMBERSHIP_PRICE}</span>
+                <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                  {/* Cover */}
+                  <div className="relative shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={book.coverUrl}
+                      alt={`${book.title} by Jordan Nassie`}
+                      className="w-40 sm:w-36 md:w-40 rounded-2xl shadow-xl shadow-gray-300/40 object-cover"
+                    />
+                    <div className="absolute -bottom-1.5 -right-1.5 w-full h-full bg-gray-200 rounded-2xl -z-10" />
                   </div>
-                  <p className="text-xs text-white/60">Live the journey every day.</p>
+
+                  {/* Info */}
+                  <div className="flex-1 text-center sm:text-left">
+                    <h3 className="text-2xl md:text-3xl font-bold tracking-tight leading-tight mb-3">
+                      {book.title}
+                    </h3>
+                    <p className="text-gray-500 leading-relaxed text-sm mb-4">
+                      {book.subtitle}
+                    </p>
+                    <p className="text-2xl font-bold mb-5">{book.price}</p>
+
+                    <a
+                      href={book.amazonUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-3 bg-black text-white font-medium px-6 py-3.5 rounded-xl hover:bg-gray-900 transition-colors text-sm"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={AMAZON_LOGO_URL}
+                        alt="Amazon"
+                        className="h-4 w-auto brightness-0 invert"
+                      />
+                      Get on Amazon
+                    </a>
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Product ladder */}
+          <div className="mt-12 pt-8 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {BOOKS.map((book) => (
+              <div key={book.id} className="p-4 bg-white rounded-xl border border-gray-200 text-center sm:text-left">
+                <p className="text-xs font-semibold tracking-wider uppercase text-gray-400 mb-1 truncate">
+                  {book.title}
+                </p>
+                <p className="text-xl font-bold mb-1">{book.price}</p>
+                <p className="text-xs text-gray-500">Begin the journey.</p>
+              </div>
+            ))}
+            <div className="p-4 bg-black text-white rounded-xl text-center sm:text-left">
+              <p className="text-xs font-semibold tracking-wider uppercase text-white/40 mb-1">Membership</p>
+              <div className="mb-1 flex items-baseline justify-center sm:justify-start gap-1.5">
+                <span className="text-xs text-white/30 line-through">$299</span>
+                <span className="text-xl font-bold">{MEMBERSHIP_PRICE}</span>
+              </div>
+              <p className="text-xs text-white/60">Live the journey every day.</p>
             </div>
           </div>
         </div>
@@ -680,7 +697,7 @@ export default function LandingPage() {
                 className="inline-flex items-center gap-3 bg-black text-white font-medium px-6 py-3.5 rounded-xl hover:bg-gray-900 transition-colors text-sm"
               >
                 <img
-                  src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Amazon_logo.svg.webp"
+                  src={AMAZON_LOGO_URL}
                   alt="Amazon"
                   className="h-5 brightness-0 invert"
                 />

@@ -4,17 +4,44 @@
  * Later these can be pulled from Supabase / a CMS instead of being hardcoded here.
  */
 
-// ─── Book ────────────────────────────────────────────────────────────────────
+// ─── Books ───────────────────────────────────────────────────────────────────
 
-export const BOOK_TITLE = "365 Thank You.";
-export const BOOK_SUBTITLE = "365 days of gratitude, faith, and seeing the future you're believing God for.";
-export const BOOK_PRICE = "$20";
+export interface SiteBook {
+  id: string;
+  title: string;
+  subtitle: string;
+  price: string;
+  coverUrl: string;
+  amazonUrl: string;
+}
 
-/**
- * Replace this placeholder with the real Amazon URL when available.
- * Example: "https://www.amazon.com/dp/XXXXXXXXXX"
- */
-export const BOOK_AMAZON_URL = "https://www.amazon.com";
+export const BOOKS: SiteBook[] = [
+  {
+    id: "thank-you",
+    title: "365 Thank You.",
+    subtitle: "365 days of gratitude, faith, and seeing the future you're believing God for.",
+    price: "$20",
+    coverUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Booksmall.png",
+    amazonUrl: "https://www.amazon.com",
+  },
+  {
+    id: "with-jesus-daily",
+    title: "With Jesus Daily",
+    subtitle: "365 days with Jesus — a daily Christian devotional to grow your faith one day at a time.",
+    price: "$20",
+    coverUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/jordandaily.jpg",
+    amazonUrl: "https://www.amazon.com/Jesus-Daily-365-Christian-Devotional/dp/B0F8VJ3KBV",
+  },
+];
+
+/** @deprecated Use BOOKS[0] — kept for existing imports */
+export const BOOK_TITLE = BOOKS[0].title;
+export const BOOK_SUBTITLE = BOOKS[0].subtitle;
+export const BOOK_PRICE = BOOKS[0].price;
+export const BOOK_AMAZON_URL = BOOKS[0].amazonUrl;
+
+export const AMAZON_LOGO_URL =
+  "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Amazon_logo.svg.webp";
 
 // ─── Membership ───────────────────────────────────────────────────────────────
 
