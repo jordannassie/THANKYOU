@@ -671,27 +671,27 @@ export default function LandingPage() {
       </section>
 
       {/* Statement of Faith */}
-      <section className="py-20 px-5 bg-black text-white">
+      <section className="py-20 px-5 bg-gray-100 text-gray-900">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="flex items-center justify-center w-14 h-14 rounded-full border border-white/20 mx-auto mb-5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex items-center justify-center w-20 h-20 rounded-full border border-gray-300 bg-white mx-auto mb-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
           </div>
-          <p className="text-xs font-semibold tracking-widest uppercase text-white/40 mb-6">Statement of Faith</p>
-          <div className="space-y-5 text-white/80 text-base leading-relaxed">
-            <p>We believe in <span className="text-white font-semibold">one God — Father, Son, and Holy Spirit.</span></p>
-            <p>We believe <span className="text-white font-semibold">Jesus Christ is the Son of God</span>, who died for our sins, rose from the dead, and is the only way to salvation.</p>
-            <p>We believe the <span className="text-white font-semibold">Bible is the inspired Word of God</span> and the foundation for our faith and life.</p>
-            <p>We believe salvation is a <span className="text-white font-semibold">gift of God&apos;s grace</span>, received through faith in Jesus Christ.</p>
-            <p>We believe in the <span className="text-white font-semibold">power of prayer, the work of the Holy Spirit, and the hope of eternal life with God.</span></p>
+          <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-6">Statement of Faith</p>
+          <div className="space-y-5 text-gray-600 text-base leading-relaxed">
+            <p>We believe in <span className="text-gray-900 font-semibold">one God — Father, Son, and Holy Spirit.</span></p>
+            <p>We believe <span className="text-gray-900 font-semibold">Jesus Christ is the Son of God</span>, who died for our sins, rose from the dead, and is the only way to salvation.</p>
+            <p>We believe the <span className="text-gray-900 font-semibold">Bible is the inspired Word of God</span> and the foundation for our faith and life.</p>
+            <p>We believe salvation is a <span className="text-gray-900 font-semibold">gift of God&apos;s grace</span>, received through faith in Jesus Christ.</p>
+            <p>We believe in the <span className="text-gray-900 font-semibold">power of prayer, the work of the Holy Spirit, and the hope of eternal life with God.</span></p>
           </div>
-          <p className="mt-10 text-2xl font-serif font-semibold text-white tracking-wide italic">Jesus is Lord.</p>
+          <p className="mt-10 text-2xl font-serif font-semibold text-gray-900 tracking-wide italic">Jesus is Lord.</p>
           <div className="mt-8 flex items-center justify-center gap-4">
-            <div className="h-px w-16 bg-white/20" />
-            <span className="text-white/30 text-xs">✦</span>
-            <div className="h-px w-16 bg-white/20" />
+            <div className="h-px w-16 bg-gray-300" />
+            <span className="text-gray-400 text-xs">✦</span>
+            <div className="h-px w-16 bg-gray-300" />
           </div>
         </div>
       </section>
