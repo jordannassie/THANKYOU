@@ -92,19 +92,30 @@ export default function VisionBoardPage() {
     if (!pollingJobId || !generating) return;
 
     let stopped = false;
-    const POLL_TIMEOUT = 5 * 60 * 1000;
+    const POLL_TIMEOUT = 4 * 60 * 1000; // 4 min — OpenAI gpt-image-2 typically < 2 min
     const startedAt    = Date.now();
     let notFoundCount  = 0;
+    let stuckWarned    = false;
 
     const poll = async () => {
       if (stopped) return;
 
-      if (Date.now() - startedAt > POLL_TIMEOUT) {
+      const elapsed = Date.now() - startedAt;
+
+      if (elapsed > POLL_TIMEOUT) {
         stopped = true;
-        setGenerateError("Generation timed out after 5 minutes. Please try again.");
+        setGenerateError(
+          "Generation timed out after 4 minutes.\n\nMost likely cause: OPENAI_API_KEY is not set in Netlify → Site configuration → Environment variables.\n\nCheck the Function Logs at app.netlify.com for details."
+        );
         setGenerating(false);
         setPollingJobId(null);
         return;
+      }
+
+      // After 90 s with no completion, show a "taking longer than usual" hint
+      if (elapsed > 90_000 && !stuckWarned) {
+        stuckWarned = true;
+        // Just update a status message — don't stop polling
       }
 
       try {

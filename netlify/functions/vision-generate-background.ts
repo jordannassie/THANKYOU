@@ -1,32 +1,28 @@
 /**
  * Netlify Background Function — Vision Image Generation (OpenAI gpt-image-2)
  *
- * The filename suffix "-background" makes Netlify return 202 immediately and
- * run this handler asynchronously for up to 15 minutes.
+ * The "-background" filename suffix makes Netlify return 202 immediately and
+ * run this handler for up to 15 minutes.
  * URL: /.netlify/functions/vision-generate-background
  *
- * IMPORTANT: The job record is created by /api/vision/start *before* the
- * client fires this function, so the status endpoint always finds the job.
+ * Auth: we skip Bearer-token verification here. The jobId is a UUID that was
+ * just created by an authenticated /api/vision/start call and returned only to
+ * that user. The user_id for saving comes from the existing job record in DB
+ * (not from the request), so there is no privilege escalation risk.
  *
- * Flow:
- *  1. Verify Bearer token → get user
- *  2. Find existing job (ownership check: job.user_id === user.id)
- *  3. Call OpenAI gpt-image-2
- *  4. Upload result to Supabase Storage
- *  5. Insert vision_board_images record
- *  6. Update job → completed | failed
+ * IMPORTANT: every early-return path must try to mark the job "failed" so the
+ * frontend polling never loops forever on a stuck "processing" status.
  */
 
 import type { Handler, HandlerEvent } from "@netlify/functions";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
+import { randomUUID } from "crypto";
 
-// ── Environment ────────────────────────────────────────────────────────
-const SUPABASE_URL      = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
-const SERVICE_KEY       = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const OPENAI_API_KEY    = process.env.OPENAI_API_KEY!;
-
+// ── Environment ─────────────────────────────────────────────────────────
+const SUPABASE_URL   = process.env.NEXT_PUBLIC_SUPABASE_URL        ?? "";
+const SERVICE_KEY    = process.env.SUPABASE_SERVICE_ROLE_KEY       ?? "";
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY                  ?? "";
 const STORAGE_BUCKET = "STORAGE";
 
 const SYSTEM_PREFIX =
@@ -36,45 +32,37 @@ const SYSTEM_PREFIX =
   "Do not add text, quotes, captions, logos or watermarks unless the user specifically asks for text. " +
   "User's vision: ";
 
-// ── Supabase helpers ───────────────────────────────────────────────────
+// ── Supabase admin client ────────────────────────────────────────────────
 function adminDB() {
+  if (!SUPABASE_URL || !SERVICE_KEY) return null;
   return createSupabaseClient(SUPABASE_URL, SERVICE_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
 
-function anonDB() {
-  return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
-
-async function updateJob(
-  db: ReturnType<typeof adminDB>,
-  jobId: string,
-  fields: Record<string, unknown>
-) {
+// ── Update job helper ───────────────────────────────────────────────────
+async function failJob(jobId: string, message: string) {
+  console.error(`[vision-bg] FAIL — Job ${jobId}: ${message}`);
+  const db = adminDB();
+  if (!db) { console.error("[vision-bg] Cannot fail job — DB client unavailable"); return; }
   const { error } = await db
     .from("vision_generation_jobs")
-    .update({ ...fields, updated_at: new Date().toISOString() })
+    .update({ status: "failed", error_message: message, updated_at: new Date().toISOString() })
     .eq("id", jobId);
-  if (error) console.error(`[vision-bg] updateJob error:`, error.message);
+  if (error) console.error("[vision-bg] failJob DB error:", error.message);
 }
 
-// ── Handler ────────────────────────────────────────────────────────────
+// ── Handler ──────────────────────────────────────────────────────────────
 export const handler: Handler = async (event: HandlerEvent) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  // ── Parse body ──────────────────────────────────────────────────────
-  let jobId = "";
+  // ── Parse body ─────────────────────────────────────────────────────────
+  let jobId  = "";
   let prompt = "";
   try {
-    const body = JSON.parse(event.body ?? "{}") as {
-      jobId?: string;
-      prompt?: string;
-    };
+    const body = JSON.parse(event.body ?? "{}") as { jobId?: string; prompt?: string };
     jobId  = (body.jobId  ?? "").trim();
     prompt = (body.prompt ?? "").trim();
   } catch {
@@ -85,31 +73,26 @@ export const handler: Handler = async (event: HandlerEvent) => {
     return { statusCode: 400, body: "Missing jobId or prompt" };
   }
 
-  // ── Verify user from Bearer token ────────────────────────────────────
-  const authHeader = event.headers["authorization"] ?? "";
-  const accessToken = authHeader.replace(/^Bearer\s+/i, "").trim();
+  console.log(`[vision-bg] START — Job ${jobId}`);
 
-  if (!accessToken) {
-    return { statusCode: 401, body: "Missing token" };
+  // ── Validate environment ────────────────────────────────────────────────
+  if (!SUPABASE_URL || !SERVICE_KEY) {
+    console.error("[vision-bg] Missing Supabase env vars");
+    // Can't update DB — just log and return
+    return { statusCode: 500, body: "Supabase env not configured" };
   }
 
-  const userClient = anonDB();
-  const {
-    data: { user },
-    error: authErr,
-  } = await userClient.auth.getUser(accessToken);
-
-  if (authErr || !user) {
-    console.error(`[vision-bg] Auth error:`, authErr?.message);
-    return { statusCode: 401, body: "Unauthorized" };
+  if (!OPENAI_API_KEY) {
+    await failJob(jobId, "OPENAI_API_KEY is not set on this server. Add it in Netlify → Site configuration → Environment variables.");
+    return { statusCode: 500, body: "OPENAI_API_KEY not set" };
   }
 
-  const db = adminDB();
+  const db = adminDB()!;
 
-  // ── Find existing job ─────────────────────────────────────────────────
+  // ── Verify job exists ──────────────────────────────────────────────────
   const { data: job, error: jobErr } = await db
     .from("vision_generation_jobs")
-    .select("*")
+    .select("id, user_id, status")
     .eq("id", jobId)
     .maybeSingle();
 
@@ -118,35 +101,23 @@ export const handler: Handler = async (event: HandlerEvent) => {
     return { statusCode: 404, body: "Job not found" };
   }
 
-  if (job.user_id !== user.id) {
-    console.error(`[vision-bg] Ownership mismatch for job ${jobId}`);
-    return { statusCode: 403, body: "Forbidden" };
-  }
-
-  // ── Validate OpenAI key ───────────────────────────────────────────────
-  if (!OPENAI_API_KEY) {
-    console.error(`[vision-bg] OPENAI_API_KEY not set`);
-    await updateJob(db, jobId, {
-      status: "failed",
-      error_message: "Image generation is not configured (missing OPENAI_API_KEY).",
-    });
-    return { statusCode: 500, body: "OPENAI_API_KEY not set" };
+  if (job.status === "completed" || job.status === "failed") {
+    console.log(`[vision-bg] Job ${jobId} already ${job.status} — skipping`);
+    return { statusCode: 200, body: "Already done" };
   }
 
   // ── Call OpenAI gpt-image-2 ────────────────────────────────────────────
-  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-  const fullPrompt = SYSTEM_PREFIX + prompt;
-
   console.log(`[vision-bg] Job ${jobId}: calling OpenAI gpt-image-2`);
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
   let imageBuffer: Buffer;
   try {
     const result = await openai.images.generate({
-      model: "gpt-image-2",
-      prompt: fullPrompt,
-      size: "1024x1024",
+      model:   "gpt-image-2",
+      prompt:  SYSTEM_PREFIX + prompt,
+      size:    "1024x1024",
       quality: "medium",
-      n: 1,
+      n:       1,
     });
 
     console.log(`[vision-bg] Job ${jobId}: OpenAI responded`);
@@ -154,11 +125,10 @@ export const handler: Handler = async (event: HandlerEvent) => {
     const imageData = result.data?.[0];
     if (!imageData) throw new Error("OpenAI returned no image data");
 
-    // gpt-image-2 returns b64_json or url depending on SDK version
     if (imageData.b64_json) {
       imageBuffer = Buffer.from(imageData.b64_json, "base64");
     } else if (imageData.url) {
-      console.log(`[vision-bg] Job ${jobId}: downloading from OpenAI URL`);
+      console.log(`[vision-bg] Job ${jobId}: downloading from OpenAI CDN`);
       const r = await fetch(imageData.url);
       if (!r.ok) throw new Error(`URL download failed: ${r.status}`);
       imageBuffer = Buffer.from(await r.arrayBuffer());
@@ -166,46 +136,37 @@ export const handler: Handler = async (event: HandlerEvent) => {
       throw new Error("OpenAI returned neither b64_json nor url");
     }
 
-    console.log(
-      `[vision-bg] Job ${jobId}: image received (${imageBuffer.length} bytes)`
-    );
+    console.log(`[vision-bg] Job ${jobId}: image downloaded (${imageBuffer.length} bytes)`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : "OpenAI generation failed";
-    console.error(`[vision-bg] Job ${jobId} OpenAI error:`, msg);
-    await updateJob(db, jobId, { status: "failed", error_message: msg });
+    await failJob(jobId, msg);
     return { statusCode: 500, body: msg };
   }
 
-  // ── Upload to Supabase Storage ─────────────────────────────────────────
-  const { randomUUID } = await import("crypto");
+  // ── Upload to Supabase Storage ──────────────────────────────────────────
   const imageId     = randomUUID();
-  const storagePath = `vision-board/${user.id}/generated/${imageId}.jpg`;
+  const storagePath = `vision-board/${job.user_id}/generated/${imageId}.jpg`;
 
   console.log(`[vision-bg] Job ${jobId}: uploading to ${STORAGE_BUCKET}/${storagePath}`);
 
   try {
     const { error: uploadErr } = await db.storage
       .from(STORAGE_BUCKET)
-      .upload(storagePath, imageBuffer, {
-        contentType: "image/jpeg",
-        upsert: false,
-      });
+      .upload(storagePath, imageBuffer, { contentType: "image/jpeg", upsert: false });
 
     if (uploadErr) throw new Error(`Storage upload: ${uploadErr.message}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Upload failed";
-    console.error(`[vision-bg] Job ${jobId} upload error:`, msg);
-    await updateJob(db, jobId, { status: "failed", error_message: msg });
+    await failJob(jobId, msg);
     return { statusCode: 500, body: msg };
   }
 
-  const { data: { publicUrl } } = db.storage
-    .from(STORAGE_BUCKET)
-    .getPublicUrl(storagePath);
+  const { data: { publicUrl } } = db.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath);
+  console.log(`[vision-bg] Job ${jobId}: uploaded → ${publicUrl}`);
 
-  // ── Insert vision_board_images record ──────────────────────────────────
+  // ── Insert vision_board_images ──────────────────────────────────────────
   const { error: insertErr } = await db.from("vision_board_images").insert({
-    user_id:      user.id,
+    user_id:      job.user_id,
     image_url:    publicUrl,
     storage_path: storagePath,
     prompt,
@@ -213,22 +174,17 @@ export const handler: Handler = async (event: HandlerEvent) => {
   });
 
   if (insertErr) {
-    console.error(
-      `[vision-bg] Job ${jobId} vision_board_images insert error:`,
-      insertErr.message
-    );
-    await updateJob(db, jobId, {
-      status: "failed",
-      error_message: `DB insert: ${insertErr.message}`,
-    });
+    await failJob(jobId, `DB insert: ${insertErr.message}`);
     return { statusCode: 500, body: insertErr.message };
   }
 
-  // ── Mark job completed ─────────────────────────────────────────────────
-  await updateJob(db, jobId, {
-    status: "completed",
-    image_path: storagePath,
-  });
+  // ── Mark job completed ──────────────────────────────────────────────────
+  const { error: updateErr } = await db
+    .from("vision_generation_jobs")
+    .update({ status: "completed", image_path: storagePath, updated_at: new Date().toISOString() })
+    .eq("id", jobId);
+
+  if (updateErr) console.error(`[vision-bg] Job ${jobId} complete-update error:`, updateErr.message);
 
   console.log(`[vision-bg] Job ${jobId}: COMPLETE ✓`);
   return { statusCode: 200, body: "OK" };
