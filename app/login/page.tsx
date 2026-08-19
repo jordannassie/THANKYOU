@@ -266,7 +266,13 @@ function LoginContent() {
               )}
 
               {error && (
-                <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl">{error}</p>
+                <div className={`text-sm px-4 py-3 rounded-xl leading-relaxed ${
+                  error.toLowerCase().includes("different browser") || error.toLowerCase().includes("sign-in link")
+                    ? "text-amber-800 bg-amber-50 border border-amber-200"
+                    : "text-red-600 bg-red-50 border border-red-100"
+                }`}>
+                  {error}
+                </div>
               )}
               {info && (
                 <p className="text-sm text-gray-700 bg-gray-50 px-4 py-3 rounded-xl leading-relaxed">{info}</p>

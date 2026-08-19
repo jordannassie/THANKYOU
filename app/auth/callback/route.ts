@@ -22,6 +22,12 @@ export async function GET(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
       {
+        cookieOptions: {
+          maxAge: 60 * 60 * 24 * 365,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+        },
         cookies: {
           getAll() {
             return cookieStore.getAll();
@@ -36,18 +42,16 @@ export async function GET(request: NextRequest) {
     );
 
     const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code);
+
     if (!error && sessionData?.user) {
       const userId = sessionData.user.id;
 
-      // ── Referral attribution ───────────────────────────────────
-      // Check for a pending referral code in the cookie.
+      // ── Referral attribution ───────────────────────────────────────────
       const refCookie = cookieStore.get("ty_ref_code");
       const refCode = refCookie?.value;
 
       if (refCode) {
         try {
-          // Fire-and-forget: attribute the referral server-side.
-          // Use the internal key (first 32 chars of service role key) to authenticate.
           const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
           await fetch(`${requestUrl.origin}/api/invite/attribute`, {
             method: "POST",
@@ -61,25 +65,36 @@ export async function GET(request: NextRequest) {
             }),
           });
         } catch (e) {
-          // Non-fatal: log and continue
           console.error("[callback] referral attribution error:", e);
         }
-
-        // Clear the referral cookie regardless
         cookieStore.set("ty_ref_code", "", { path: "/", maxAge: 0 });
       }
 
-      // Always redirect to /dashboard after successful auth
       const redirectTo = next.startsWith("/") ? next : "/dashboard";
       return NextResponse.redirect(`${requestUrl.origin}${redirectTo}`);
     }
 
+    // ── Error handling ───────────────────────────────────────────────────
+    const errMsg = error?.message ?? "Authentication failed";
+
+    // PKCE verifier missing → user opened the link in a different browser.
+    // Give them a clear, actionable message instead of a cryptic Supabase error.
+    if (errMsg.toLowerCase().includes("pkce") || errMsg.toLowerCase().includes("code verifier")) {
+      return NextResponse.redirect(
+        `${requestUrl.origin}/login?error=${encodeURIComponent(
+          "The sign-in link was opened in a different browser. Please sign in directly below."
+        )}`
+      );
+    }
+
     return NextResponse.redirect(
-      `${requestUrl.origin}/login?error=${encodeURIComponent(error?.message ?? "Auth failed")}`
+      `${requestUrl.origin}/login?error=${encodeURIComponent(errMsg)}`
     );
   }
 
   return NextResponse.redirect(
-    `${requestUrl.origin}/login?error=${encodeURIComponent("No auth code received. Please try again.")}`
+    `${requestUrl.origin}/login?error=${encodeURIComponent(
+      "No auth code received. Please try again."
+    )}`
   );
 }
