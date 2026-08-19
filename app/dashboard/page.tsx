@@ -24,6 +24,20 @@ export default function DashboardPage() {
 
   const [visionPrompt, setVisionPrompt] = useState("");
   const [declaration, setDeclaration] = useState(mockDreamDeclaration);
+
+  // Load persisted declaration from localStorage once user is known
+  useEffect(() => {
+    if (!user?.id) return;
+    const saved = localStorage.getItem(`ty-dream-${user.id}`);
+    if (saved) setDeclaration(saved);
+  }, [user?.id]);
+
+  const handleSaveDeclaration = (value: string) => {
+    setDeclaration(value);
+    if (user?.id) {
+      localStorage.setItem(`ty-dream-${user.id}`, value);
+    }
+  };
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState("");
   const [gridRefreshKey, setGridRefreshKey] = useState(0);
@@ -181,7 +195,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Dream Declaration — sits above vision tools */}
-      <DreamDeclaration declaration={declaration} onSave={setDeclaration} />
+      <DreamDeclaration declaration={declaration} onSave={handleSaveDeclaration} />
 
       {/* My Vision Section */}
       <section>

@@ -490,15 +490,13 @@ export default function LandingPage() {
                 </div>
               )}
 
-              <a
-                href={NEXT_ZOOM_CALL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/login"
                 className="inline-flex items-center gap-2 bg-white text-[#2D8CFF] font-semibold px-8 py-4 rounded-xl hover:bg-blue-50 transition-colors text-sm"
               >
                 Join to Attend
                 <ArrowRight size={15} />
-              </a>
+              </Link>
               <p className="text-xs text-white/50 mt-3">
                 Members only —{" "}
                 <Link href="/login" className="underline hover:text-white transition-colors">

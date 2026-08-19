@@ -121,12 +121,14 @@ function LoginContent() {
         {/* Left — Brand Panel */}
         <div className="hidden md:flex md:w-1/2 bg-black text-white flex-col justify-between p-12">
           <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Thank%20you%20black.png"
-              alt="Thank You."
-              className="h-16 w-auto object-contain"
-            />
+            <a href="/" className="inline-block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Thank%20you%20black.png"
+                alt="Thank You."
+                className="h-16 w-auto object-contain"
+              />
+            </a>
             <p className="text-sm text-white/50 mt-3 tracking-wide">Receive. Believe. Thank.</p>
           </div>
           <div className="space-y-6">
@@ -152,12 +154,14 @@ function LoginContent() {
         <div className="flex-1 flex flex-col justify-center px-6 py-12 md:px-16 lg:px-24 bg-white">
           {/* Mobile brand */}
           <div className="md:hidden mb-10">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Thank%20you%20black.png"
-              alt="Thank You."
-              className="h-12 w-auto object-contain"
-            />
+            <a href="/" className="inline-block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Thank%20you%20black.png"
+                alt="Thank You."
+                className="h-12 w-auto object-contain"
+              />
+            </a>
             <p className="text-sm text-gray-400 mt-2 tracking-wide">Receive. Believe. Thank.</p>
           </div>
 
