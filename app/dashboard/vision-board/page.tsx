@@ -15,6 +15,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/components/providers/UserProvider";
 import type { VisionImage } from "@/lib/types";
+import VisionLoadingBar from "@/components/dashboard/VisionLoadingBar";
 
 // ── Constants ────────────────────────────────────────────────
 
@@ -524,17 +525,7 @@ export default function VisionBoardPage() {
                   </div>
                 )}
 
-                {generating && (
-                  <div className="mt-3 bg-gray-50 px-4 py-4 rounded-xl space-y-1">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                      <Loader2 size={15} className="animate-spin shrink-0" />
-                      Creating your vision…
-                    </div>
-                    <p className="text-xs text-gray-500 leading-relaxed pl-5">
-                      This can take up to a minute or two. You can keep this window open while we create your image.
-                    </p>
-                  </div>
-                )}
+                {generating && <VisionLoadingBar />}
 
                 <div className="flex gap-3 mt-4">
                   <button
@@ -547,7 +538,12 @@ export default function VisionBoardPage() {
                   <button
                     onClick={handleGenerate}
                     disabled={generating || prompt.trim().length < 3}
-                    className="flex-1 bg-black text-white text-sm font-medium py-3 rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 text-white text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all disabled:cursor-not-allowed disabled:opacity-40"
+                    style={generating ? {
+                      background: "linear-gradient(90deg, #7c3aed, #2563eb, #06b6d4, #7c3aed)",
+                      backgroundSize: "300% 100%",
+                      animation: "vb-sweep 2.4s linear infinite",
+                    } : { background: "#000" }}
                   >
                     {generating ? (
                       <><Loader2 size={14} className="animate-spin" /> Generating…</>

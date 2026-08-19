@@ -12,6 +12,7 @@ import ZoomCard from "@/components/dashboard/ZoomCard";
 import DreamDeclaration from "@/components/dashboard/DreamDeclaration";
 import VisionGrid from "@/components/dashboard/VisionGrid";
 import NotesPreview from "@/components/dashboard/NotesPreview";
+import VisionLoadingBar from "@/components/dashboard/VisionLoadingBar";
 
 
 export default function DashboardPage() {
@@ -216,7 +217,12 @@ export default function DashboardPage() {
           <button
             onClick={handleGenerate}
             disabled={generating || !visionPrompt.trim()}
-            className="inline-flex items-center gap-1.5 bg-black text-white text-sm font-medium px-5 py-3 rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 text-white text-sm font-semibold px-5 py-3 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            style={generating ? {
+              background: "linear-gradient(90deg, #7c3aed, #2563eb, #06b6d4, #7c3aed)",
+              backgroundSize: "300% 100%",
+              animation: "vb-sweep 2.4s linear infinite",
+            } : { background: "#000" }}
           >
             {generating ? (
               <Loader2 size={14} className="animate-spin" />
@@ -239,17 +245,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {generating && (
-          <div className="bg-gray-50 px-4 py-4 rounded-xl mb-4 space-y-1">
-            <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-              <Loader2 size={15} className="animate-spin shrink-0" />
-              Creating your vision…
-            </div>
-            <p className="text-xs text-gray-500 leading-relaxed pl-5">
-              This can take up to a minute or two. You can keep this window open while we create your image.
-            </p>
-          </div>
-        )}
+        {generating && <VisionLoadingBar />}
 
         {/* Vision Grid — shows real user images */}
         <VisionGrid refreshKey={gridRefreshKey} />
