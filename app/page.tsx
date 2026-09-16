@@ -18,37 +18,6 @@ import {
 import ZoomCountdownBar from "@/components/ZoomCountdownBar";
 import Globe from "@/components/Globe";
 
-const HERO_WORDS = ["receiving", "believing", "thanking"];
-
-function HeroWord() {
-  const [index, setIndex] = useState(0);
-  const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // fade out
-      setVisible(false);
-      setTimeout(() => {
-        setIndex((i) => (i + 1) % HERO_WORDS.length);
-        setVisible(true);
-      }, 400);
-    }, 2600);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <span
-      className="font-serif italic font-normal inline-block"
-      style={{
-        transition: "opacity 0.4s ease, transform 0.4s ease",
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(-8px)",
-      }}
-    >
-      {" "}{HERO_WORDS[index]}
-    </span>
-  );
-}
 import {
   BOOKS,
   AMAZON_LOGO_URL,
@@ -68,6 +37,42 @@ const features = [
   { icon: Users, title: "Community", description: "Grow alongside others who are believing for their future." },
   { icon: Video, title: "Monthly Calls", description: "Join live encouragement, teaching, and accountability." },
 ];
+
+const CHALLENGE = {
+  announcement: "FOUNDING COHORT · THE THANK YOU CHALLENGE 40",
+  label: "A 40-DAY THANK YOU OUTREACH CHALLENGE",
+  headline: ["THANK YOU", "ON CAMERA."],
+  accent: "40 days.",
+  subheadline: "Share what God has done. Build your outreach. Help people live happier. Share Jesus.",
+  body: "Forty simple posts. A repeatable content system to help you show up on camera, share hope, encourage people, and build an online outreach rooted in faith.",
+  cta: "JOIN THE CHALLENGE",
+  ctaHref: "/login",
+  secondary: "See how the 40 days work",
+  secondaryHref: "#what-you-build",
+  proof: "40 post prompts · Daily guidance · Community · Live encouragement",
+  portraitUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Jordan%20Profile.PNG",
+  portraitAlt: "Jordan Nassie",
+  buildEyebrow: "The Thank You Challenge 40",
+  buildTitle: "What you'll build in 40 days",
+  buildItems: [
+    {
+      title: "Your Thank You Story",
+      description: "Name what God has done in your life, so you can share it with clarity and conviction.",
+    },
+    {
+      title: "Your Daily Content Rhythm",
+      description: "A simple practice for showing up on camera each day — without guesswork or performance.",
+    },
+    {
+      title: "Your Online Outreach",
+      description: "A public witness people can follow, share, and be encouraged by.",
+    },
+    {
+      title: "A Way to Invite People to Jesus",
+      description: "Not a sales funnel. A faithful invitation into hope.",
+    },
+  ],
+};
 
 function useCountdown(target: Date) {
   const [time, setTime] = useState({ days: 0, hours: 0, mins: 0, secs: 0, live: false });
@@ -178,107 +183,105 @@ export default function LandingPage() {
       {/* Spacer for fixed bar + nav (bar ~40px + nav ~65px) */}
       <div className="h-[105px]" />
 
-      {/* Hero */}
-      <section className="pt-20 pb-20 md:pt-28 md:pb-28 px-5">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-sm font-medium text-gray-400 tracking-widest uppercase mb-6">
-            Receive. Believe. Thank.
+      {/* Hero — The Thank You Challenge 40 */}
+      <section className="bg-[#050505] text-white">
+        <div className="bg-[#D8B15B] text-[#050505] text-center px-4 py-2">
+          <p className="text-[11px] font-semibold tracking-[0.2em] uppercase">
+            {CHALLENGE.announcement}
           </p>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
-            See the future you are<br className="hidden sm:block" />
-            <HeroWord /> God for...
-          </h1>
-          <p className="text-lg text-gray-500 mt-8 max-w-xl mx-auto leading-relaxed">
-            Create your vision. Write it down. Give thanks. Keep believing. Watch what God does.
-          </p>
-          {/* Social proof — member avatars */}
-          <div className="flex flex-col items-center gap-3 mt-10">
-            <div className="flex items-center">
-              {[
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80&h=80&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=80&h=80&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face",
-              ].map((src, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  key={i}
-                  src={src}
-                  alt=""
-                  className="w-9 h-9 rounded-full border-2 border-white object-cover"
-                  style={{ marginLeft: i === 0 ? 0 : "-10px", zIndex: 10 - i }}
-                />
-              ))}
-              <div
-                className="w-9 h-9 rounded-full border-2 border-white bg-black text-white flex items-center justify-center text-[10px] font-bold"
-                style={{ marginLeft: "-10px", zIndex: 1 }}
-              >
-                +2k
+        </div>
+
+        <div className="grid lg:grid-cols-2 lg:h-[680px]">
+          <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-14 xl:px-16 py-12 lg:py-0">
+            <div className="max-w-lg">
+              <p className="inline-flex items-center border border-white/25 px-3 py-1.5 text-[10px] sm:text-[11px] font-medium tracking-[0.18em] uppercase text-white/80">
+                {CHALLENGE.label}
+              </p>
+
+              <h1 className="font-condensed font-bold uppercase tracking-tight leading-[0.86] text-[3.25rem] sm:text-6xl lg:text-[4.6rem] mt-6">
+                {CHALLENGE.headline[0]}
+                <br />
+                {CHALLENGE.headline[1]}
+              </h1>
+
+              <p className="font-serif italic text-3xl sm:text-4xl mt-3 text-[#D8B15B]">
+                {CHALLENGE.accent}
+              </p>
+
+              <p className="mt-6 text-[15px] sm:text-base text-white/80 leading-relaxed">
+                {CHALLENGE.subheadline}
+              </p>
+              <p className="mt-4 text-sm text-white/50 leading-relaxed">
+                {CHALLENGE.body}
+              </p>
+
+              <div className="mt-8">
+                <Link
+                  href={CHALLENGE.ctaHref}
+                  className="inline-flex items-center gap-2.5 bg-white text-black font-semibold tracking-[0.14em] uppercase text-sm px-7 py-3.5 hover:bg-neutral-200 transition-colors"
+                >
+                  {CHALLENGE.cta}
+                  <ArrowRight size={15} />
+                </Link>
+                <a
+                  href={CHALLENGE.secondaryHref}
+                  className="block mt-3 text-sm text-white/55 hover:text-white transition-colors underline underline-offset-4 decoration-white/25"
+                >
+                  {CHALLENGE.secondary}
+                </a>
+              </div>
+
+              <div className="mt-8 pt-5 border-t border-white/15">
+                <p className="text-[11px] tracking-[0.14em] uppercase text-white/40">
+                  {CHALLENGE.proof}
+                </p>
               </div>
             </div>
-            <p className="text-sm text-gray-500">
-              <span className="font-semibold text-black">2,000+ members</span> already seeing their vision come to pass
-            </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
-            <Link
-              href="/login"
-              className="bg-black text-white font-medium px-8 py-4 rounded-xl hover:bg-gray-900 transition-colors text-sm w-full sm:w-auto text-center"
-            >
-              Start Your Vision
-            </Link>
-            <Link
-              href="/login"
-              className="border border-gray-200 text-black font-medium px-8 py-4 rounded-xl hover:bg-gray-50 transition-colors text-sm w-full sm:w-auto text-center"
-            >
-              Sign In
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Split invite — black & white */}
-      <section className="bg-black text-white">
-        <div className="grid lg:grid-cols-2">
-          <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-16 py-16 lg:py-24">
-            <p className="text-xs font-semibold tracking-[0.22em] uppercase text-white/50 mb-5">
-              Receive. Believe. Thank.
-            </p>
-            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95] uppercase">
-              See the future.
-            </h2>
-            <p className="font-serif italic text-4xl sm:text-5xl mt-2 text-white/90">
-              thank Him.
-            </p>
-            <p className="text-white/55 mt-6 max-w-md leading-relaxed">
-              Create your vision. Write it down. Give thanks. Keep believing. Watch what God does.
-            </p>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 bg-white text-black font-semibold px-7 py-3.5 rounded-lg hover:bg-gray-100 transition-colors text-sm mt-8 w-fit"
-            >
-              Start Your Vision
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-          <div className="relative min-h-[380px] lg:min-h-[560px] bg-neutral-200">
+          <div className="relative h-[420px] lg:h-full bg-neutral-200">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Jordan%20Profile.PNG"
-              alt="Jordan Nassie"
+              src={CHALLENGE.portraitUrl}
+              alt={CHALLENGE.portraitAlt}
               className="absolute inset-0 w-full h-full object-cover object-[center_18%] grayscale"
             />
           </div>
         </div>
       </section>
 
+      {/* What you'll build in 40 days */}
+      <section id="what-you-build" className="bg-white px-5 py-20 md:py-24">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[#D8B15B] mb-3">
+            {CHALLENGE.buildEyebrow}
+          </p>
+          <h2 className="font-condensed text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-tight">
+            {CHALLENGE.buildTitle}
+          </h2>
+          <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 border-t border-neutral-200">
+            {CHALLENGE.buildItems.map((item, i) => (
+              <div
+                key={item.title}
+                className="py-8 lg:py-10 lg:pr-8 lg:pl-8 first:lg:pl-0 border-b border-neutral-200 lg:border-b-0 lg:border-l lg:first:border-l-0"
+              >
+                <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 mb-4">
+                  0{i + 1}
+                </p>
+                <h3 className="text-lg font-semibold tracking-tight leading-snug mb-3">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-neutral-500 leading-relaxed">
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Dashboard Preview */}
-      <section className="px-5 pt-24 pb-24">
+      <section className="px-5 pb-24">
         <div className="max-w-6xl mx-auto">
           <div className="rounded-3xl overflow-hidden shadow-2xl shadow-gray-300/50 border border-gray-200">
             {/* Browser chrome bar */}

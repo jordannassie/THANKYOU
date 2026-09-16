@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -23,6 +23,10 @@ body {
 
 .font-sans {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-condensed {
+  font-family: 'Oswald', 'Inter', sans-serif;
 }
 
 /* Scrollbar */
