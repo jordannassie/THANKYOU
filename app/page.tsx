@@ -242,8 +242,43 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Split invite — black & white */}
+      <section className="bg-black text-white">
+        <div className="grid lg:grid-cols-2">
+          <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-16 py-16 lg:py-24">
+            <p className="text-xs font-semibold tracking-[0.22em] uppercase text-white/50 mb-5">
+              Receive. Believe. Thank.
+            </p>
+            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95] uppercase">
+              See the future.
+            </h2>
+            <p className="font-serif italic text-4xl sm:text-5xl mt-2 text-white/90">
+              thank Him.
+            </p>
+            <p className="text-white/55 mt-6 max-w-md leading-relaxed">
+              Create your vision. Write it down. Give thanks. Keep believing. Watch what God does.
+            </p>
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 bg-white text-black font-semibold px-7 py-3.5 rounded-lg hover:bg-gray-100 transition-colors text-sm mt-8 w-fit"
+            >
+              Start Your Vision
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="relative min-h-[380px] lg:min-h-[560px] bg-neutral-200">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Jordan%20Profile.PNG"
+              alt="Jordan Nassie"
+              className="absolute inset-0 w-full h-full object-cover object-[center_18%] grayscale"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Dashboard Preview */}
-      <section className="px-5 pb-24">
+      <section className="px-5 pt-24 pb-24">
         <div className="max-w-6xl mx-auto">
           <div className="rounded-3xl overflow-hidden shadow-2xl shadow-gray-300/50 border border-gray-200">
             {/* Browser chrome bar */}
