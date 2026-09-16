@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  Video,
   LayoutDashboard,
   Image,
   BookOpen,
@@ -15,6 +16,7 @@ import { signOut } from "@/lib/auth";
 import { useUser } from "@/components/providers/UserProvider";
 
 const navItems = [
+  { href: "/dashboard/challenge", label: "Challenge", icon: Video },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/vision-board", label: "Vision Board", icon: Image },
   { href: "/dashboard/notes", label: "Notes", icon: BookOpen },

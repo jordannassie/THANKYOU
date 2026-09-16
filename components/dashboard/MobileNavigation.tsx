@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Video,
   LayoutDashboard,
   Image,
   BookOpen,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 
 const navItems = [
+  { href: "/dashboard/challenge", label: "Challenge", icon: Video },
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/dashboard/vision-board", label: "Vision", icon: Image },
   { href: "/dashboard/notes", label: "Notes", icon: BookOpen },
@@ -34,7 +36,7 @@ export default function MobileNavigation() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all duration-150 min-w-0 ${
+              className={`flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-all duration-150 min-w-0 ${
                 isActive ? "text-black" : "text-gray-400"
               }`}
             >
