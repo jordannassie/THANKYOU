@@ -244,7 +244,7 @@ export default function LandingPage() {
             <img
               src={CHALLENGE.portraitUrl}
               alt={CHALLENGE.portraitAlt}
-              className="absolute inset-0 w-full h-full object-cover object-[center_18%] grayscale"
+              className="absolute inset-0 w-full h-full object-cover object-[center_18%]"
             />
           </div>
         </div>
