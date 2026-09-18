@@ -18,7 +18,7 @@ export interface SiteBook {
 export const LOGO_DARK_URL =
   "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/Thankyou/Thank%20you%20dark.png";
 export const LOGO_WHITE_URL =
-  "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/Thankyou/Logowhite.png";
+  "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/Thankyou/White%20logo.png";
 
 export const BOOKS: SiteBook[] = [
   {
