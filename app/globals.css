@@ -87,3 +87,40 @@ input:checked + .toggle-slider:before {
   0%   { background-position: 200% center; }
   100% { background-position: -200% center; }
 }
+
+@keyframes globe-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  14% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  52% {
+    opacity: 1;
+    transform: translateY(-8px);
+  }
+  68% {
+    opacity: 0.2;
+    transform: translateY(-12px);
+  }
+  82%, 100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.globe-bubble {
+  animation-name: globe-bubble;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .globe-bubble {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

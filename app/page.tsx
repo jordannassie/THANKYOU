@@ -103,6 +103,7 @@ function useCountdown(target: Date) {
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const countdown = useCountdown(NEXT_ZOOM_CALL_DATE);
+  const featuredBook = BOOKS[0];
 
   // If Google OAuth redirected back to the home page instead of /auth/callback
   // (happens when Google Cloud Console has the wrong redirect URI registered),
@@ -367,73 +368,38 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-10 md:gap-12">
-            {BOOKS.map((book) => (
-              <div
-                key={book.id}
-                className="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col"
-              >
-                <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-                  {/* Cover */}
-                  <div className="relative shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={book.coverUrl}
-                      alt={`${book.title} by Jordan Nassie`}
-                      className="w-40 sm:w-36 md:w-40 rounded-2xl shadow-xl shadow-gray-300/40 object-cover"
-                    />
-                    <div className="absolute -bottom-1.5 -right-1.5 w-full h-full bg-gray-200 rounded-2xl -z-10" />
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 text-center sm:text-left">
-                    <h3 className="text-2xl md:text-3xl font-bold tracking-tight leading-tight mb-3">
-                      {book.title}
-                    </h3>
-                    <p className="text-gray-500 leading-relaxed text-sm mb-4">
-                      {book.subtitle}
-                    </p>
-                    <p className="text-2xl font-bold mb-5">{book.price}</p>
-
-                    <a
-                      href={book.amazonUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 bg-black text-white font-medium px-6 py-3.5 rounded-xl hover:bg-gray-900 transition-colors text-sm"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={AMAZON_LOGO_URL}
-                        alt="Amazon"
-                        className="h-4 w-auto brightness-0 invert"
-                      />
-                      Get on Amazon
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Product ladder */}
-          <div className="mt-12 pt-8 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {BOOKS.map((book) => (
-              <div key={book.id} className="p-4 bg-white rounded-xl border border-gray-200 text-center sm:text-left">
-                <p className="text-xs font-semibold tracking-wider uppercase text-gray-400 mb-1 truncate">
-                  {book.title}
-                </p>
-                <p className="text-xl font-bold mb-1">{book.price}</p>
-                <p className="text-xs text-gray-500">Begin the journey.</p>
-              </div>
-            ))}
-            <div className="p-4 bg-black text-white rounded-xl text-center sm:text-left">
-              <p className="text-xs font-semibold tracking-wider uppercase text-white/40 mb-1">Membership</p>
-              <div className="mb-1 flex items-baseline justify-center sm:justify-start gap-1.5">
-                <span className="text-xs text-white/30 line-through">{MEMBERSHIP_PRICE_WAS}</span>
-                <span className="text-xl font-bold">{MEMBERSHIP_PRICE}</span>
-              </div>
-              <p className="text-xs text-white/60">Live the journey every day.</p>
+          <div className="flex flex-col items-center text-center max-w-xl mx-auto">
+            <div className="relative mb-10">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={featuredBook.coverUrl}
+                alt={`${featuredBook.title} by Jordan Nassie`}
+                className="w-56 sm:w-64 md:w-72 lg:w-80 rounded-3xl shadow-2xl shadow-gray-300/50 object-contain bg-white"
+              />
             </div>
+
+            <h3 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight mb-4">
+              {featuredBook.title}
+            </h3>
+            <p className="text-gray-500 leading-relaxed mb-6 max-w-md">
+              {featuredBook.subtitle}
+            </p>
+            <p className="text-3xl font-bold mb-7">{featuredBook.price}</p>
+
+            <a
+              href={featuredBook.amazonUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 bg-black text-white font-medium px-7 py-3.5 rounded-xl hover:bg-gray-900 transition-colors text-sm"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={AMAZON_LOGO_URL}
+                alt="Amazon"
+                className="h-4 w-auto brightness-0 invert"
+              />
+              Get on Amazon
+            </a>
           </div>
         </div>
       </section>
@@ -548,43 +514,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Next Meetup — Globe */}
-      <section className="py-24 px-5 bg-black text-white overflow-hidden">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col-reverse lg:flex-row items-center gap-12">
-
-            {/* Globe */}
-            <div className="flex-1 w-full">
-              <Globe />
-            </div>
-
-            {/* Copy */}
-            <div className="flex-1 text-center lg:text-left">
-              <p className="text-xs font-semibold tracking-widest uppercase text-white/40 mb-4">Next Meetup</p>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-                Dallas, TX
-              </h2>
-              <div className="flex items-center justify-center lg:justify-start gap-2 mb-6">
-                <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                <p className="text-white/60 text-sm">In-person gathering — coming soon</p>
-              </div>
-              <p className="text-white/50 leading-relaxed mb-8 max-w-md mx-auto lg:mx-0">
-                Join Jordan and the Thank You. community for a live in-person event in Dallas, TX. A day of faith, vision, and gratitude — together.
-              </p>
-
-              <div className="inline-flex flex-col items-center lg:items-start gap-3">
-                <Link
-                  href="/login"
-                  className="inline-flex items-center gap-2 bg-white text-black font-semibold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-sm"
-                >
-                  Join the Waitlist
-                  <ArrowRight size={15} />
-                </Link>
-                <p className="text-xs text-white/30">Members get first access.</p>
-              </div>
-            </div>
-
-          </div>
+      {/* Gratitude globe */}
+      <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-5 bg-black text-white overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <Globe />
         </div>
       </section>
 
