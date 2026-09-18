@@ -60,14 +60,17 @@ const CHALLENGE = {
     {
       title: "Thank God",
       description: "Each day, thank God in advance for what you want to see in your life.",
+      imageUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/fun/God.png",
     },
     {
       title: "Record a short video",
       description: "Use the daily prompt to share your thank you on camera—in just a few minutes.",
+      imageUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/fun/recode.png",
     },
     {
       title: "Share hope",
       description: "Post it online and encourage someone else with your faith and gratitude.",
+      imageUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/fun/Hope.png",
     },
   ],
 };
@@ -252,24 +255,21 @@ export default function LandingPage() {
       {/* What you'll build in 40 days */}
       <section id="what-you-build" className="bg-white px-5 py-20 md:py-24">
         <div className="max-w-6xl mx-auto">
-          <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[#FFF200] mb-3">
+          <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-black mb-3">
             {CHALLENGE.buildEyebrow}
           </p>
           <h2 className="font-condensed text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-tight">
             {CHALLENGE.buildTitle}
           </h2>
-          <div className="mt-12 grid md:grid-cols-3 border-t border-neutral-200">
-            {CHALLENGE.buildItems.map((item, i) => (
-              <div
-                key={item.title}
-                className="py-10 md:py-14 md:pr-10 md:pl-10 first:md:pl-0 last:md:pr-0 border-b border-neutral-200 md:border-b-0 md:border-l md:first:border-l-0"
-              >
-                <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 mb-5">
-                  0{i + 1}
-                </p>
-                <h3 className="text-lg font-semibold tracking-tight leading-snug uppercase mb-4">
-                  {item.title}
-                </h3>
+          <div className="mt-12 grid md:grid-cols-3 gap-8 md:gap-10">
+            {CHALLENGE.buildItems.map((item) => (
+              <div key={item.title}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={item.imageUrl}
+                  alt={item.title}
+                  className="w-full aspect-square object-cover rounded-2xl mb-5"
+                />
                 <p className="text-sm text-neutral-500 leading-relaxed">
                   {item.description}
                 </p>
