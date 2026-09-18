@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import { useUser } from "@/components/providers/UserProvider";
+import { LOGO_DARK_URL } from "@/lib/site-config";
 
 const navItems = [
   { href: "/dashboard/challenge", label: "Challenge", icon: Video },
@@ -45,7 +46,7 @@ export default function DashboardSidebar() {
       <div className="px-6 pt-7 pb-5 border-b border-white/10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Thank%20you%20black.png"
+          src={LOGO_DARK_URL}
           alt="Thank You."
           className="h-12 w-auto object-contain"
         />

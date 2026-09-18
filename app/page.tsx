@@ -20,6 +20,7 @@ import Globe from "@/components/Globe";
 
 import {
   BOOKS,
+  LOGO_WHITE_URL,
   AMAZON_LOGO_URL,
   BOOK_AMAZON_URL,
   MEMBERSHIP_PRICE,
@@ -127,7 +128,7 @@ export default function LandingPage() {
           <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
             <Link href="/">
               <img
-                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Logo.png"
+                src={LOGO_WHITE_URL}
                 alt="Thank You."
                 className="h-16 w-auto object-contain"
               />

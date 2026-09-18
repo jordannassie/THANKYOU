@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { signIn, signUp, sendPasswordReset, signInWithGoogle } from "@/lib/auth";
 import ZoomCountdownBar from "@/components/ZoomCountdownBar";
-import { BOOK_AMAZON_URL } from "@/lib/site-config";
+import { BOOK_AMAZON_URL, LOGO_DARK_URL, LOGO_WHITE_URL } from "@/lib/site-config";
 
 // Admin access code — change this to secure access
 const ADMIN_CODE = "1234";
@@ -135,7 +135,7 @@ function LoginContent() {
             <a href="/" className="inline-block">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Thank%20you%20black.png"
+                src={LOGO_DARK_URL}
                 alt="Thank You."
                 className="h-16 w-auto object-contain"
               />
@@ -168,7 +168,7 @@ function LoginContent() {
             <a href="/" className="inline-block">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Thank%20you%20black.png"
+                src={LOGO_WHITE_URL}
                 alt="Thank You."
                 className="h-12 w-auto object-contain"
               />

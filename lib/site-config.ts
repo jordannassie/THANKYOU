@@ -15,13 +15,18 @@ export interface SiteBook {
   amazonUrl: string;
 }
 
+export const LOGO_DARK_URL =
+  "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/Thankyou/Thank%20you%20dark.png";
+export const LOGO_WHITE_URL =
+  "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/Thankyou/Logowhite.png";
+
 export const BOOKS: SiteBook[] = [
   {
     id: "thank-you",
     title: "365 Thank You.",
     subtitle: "365 days of gratitude, faith, and seeing the future you're believing God for.",
     price: "$20",
-    coverUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Booksmall.png",
+    coverUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/Thankyou/Thank%20youbook.png",
     amazonUrl: "https://www.amazon.com",
   },
   {

@@ -2,6 +2,7 @@
 
 import { useUser } from "@/components/providers/UserProvider";
 import { getInitials } from "@/lib/types";
+import { LOGO_DARK_URL } from "@/lib/site-config";
 
 export default function MobileTopBar() {
   const { user, profile } = useUser();
@@ -13,7 +14,7 @@ export default function MobileTopBar() {
       <div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Thank%20you%20black.png"
+          src={LOGO_DARK_URL}
           alt="Thank You."
           className="h-9 w-auto object-contain"
         />
