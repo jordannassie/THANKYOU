@@ -41,7 +41,7 @@ const features = [
 ];
 
 const CHALLENGE = {
-  announcement: "FEEL HAPPY. LET GOD FULFILL YOUR FUTURE.",
+  announcement: "LIVE HAPPY. LET GOD FULFILL YOUR FUTURE.",
   label: "A 40-DAY THANK YOU OUTREACH CHALLENGE",
   headline: ["THANK YOU", "ON CAMERA."],
   accent: "40 days.",
@@ -52,8 +52,8 @@ const CHALLENGE = {
   secondary: "See how the 40 days work",
   secondaryHref: "#what-you-build",
   proof: "40 post prompts · Daily guidance · Community · Live encouragement",
-  portraitUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/logos/Jordan%20Profile.PNG",
-  portraitAlt: "Jordan Nassie",
+  portraitUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/fun/95af625e-72f4-46f6-96ce-5e5157c8f65d.png",
+  portraitAlt: "5 Minute Thank You",
   buildEyebrow: "The Thank You Challenge 40",
   buildTitle: "What you'll build in 40 days",
   buildItems: [
@@ -247,7 +247,7 @@ export default function LandingPage() {
             <img
               src={CHALLENGE.portraitUrl}
               alt={CHALLENGE.portraitAlt}
-              className="absolute inset-0 w-full h-full object-cover object-[center_18%]"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
           </div>
         </div>
