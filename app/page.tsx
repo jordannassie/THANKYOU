@@ -41,7 +41,7 @@ const features = [
 ];
 
 const CHALLENGE = {
-  announcement: "FOUNDING COHORT · THE THANK YOU CHALLENGE 40",
+  announcement: "FEEL HAPPY. LET GOD FULFILL YOUR FUTURE.",
   label: "A 40-DAY THANK YOU OUTREACH CHALLENGE",
   headline: ["THANK YOU", "ON CAMERA."],
   accent: "40 days.",
