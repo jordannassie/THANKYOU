@@ -42,36 +42,32 @@ const features = [
 
 const CHALLENGE = {
   announcement: "LIVE HAPPY. LET GOD FULFILL YOUR FUTURE.",
-  label: "A 40-DAY THANK YOU OUTREACH CHALLENGE",
+  label: "A 6-WEEK THANK YOU CHALLENGE",
   headline: ["THANK YOU", "ON CAMERA."],
-  accent: "40 days.",
+  accent: "6 weeks.",
   subheadline: "Share what God has done. Build your outreach. Help people live happier. Share Jesus.",
-  body: "Forty simple posts. A repeatable content system to help you show up on camera, share hope, encourage people, and build an online outreach rooted in faith.",
-  cta: "JOIN THE CHALLENGE",
+  body: "42 daily prompts. A repeatable content system to help you show up on camera, share hope, encourage people, and build an online outreach rooted in faith.",
+  cta: "SIGN ME UP",
   ctaHref: "/login",
-  secondary: "See how the 40 days work",
+  secondary: "See how the 6 weeks work",
   secondaryHref: "#what-you-build",
-  proof: "40 post prompts · Daily guidance · Community · Live encouragement",
+  proof: "42 daily prompts · Daily guidance · Community · Live encouragement",
   portraitUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/fun/95af625e-72f4-46f6-96ce-5e5157c8f65d.png",
   portraitAlt: "5 Minute Thank You",
-  buildEyebrow: "The Thank You Challenge 40",
-  buildTitle: "What you'll build in 40 days",
+  buildEyebrow: "The 6-Week Thank You Challenge",
+  buildTitle: "What you'll do in 6 weeks",
   buildItems: [
     {
-      title: "Your Thank You Story",
-      description: "Name what God has done in your life, so you can share it with clarity and conviction.",
+      title: "Thank God",
+      description: "Each day, thank God in advance for what you want to see in your life.",
     },
     {
-      title: "Your Daily Content Rhythm",
-      description: "A simple practice for showing up on camera each day — without guesswork or performance.",
+      title: "Record a short video",
+      description: "Use the daily prompt to share your thank you on camera—in just a few minutes.",
     },
     {
-      title: "Your Online Outreach",
-      description: "A public witness people can follow, share, and be encouraged by.",
-    },
-    {
-      title: "A Way to Invite People to Jesus",
-      description: "Not a sales funnel. A faithful invitation into hope.",
+      title: "Share hope",
+      description: "Post it online and encourage someone else with your faith and gratitude.",
     },
   ],
 };
@@ -262,16 +258,16 @@ export default function LandingPage() {
           <h2 className="font-condensed text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-tight">
             {CHALLENGE.buildTitle}
           </h2>
-          <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 border-t border-neutral-200">
+          <div className="mt-12 grid md:grid-cols-3 border-t border-neutral-200">
             {CHALLENGE.buildItems.map((item, i) => (
               <div
                 key={item.title}
-                className="py-8 lg:py-10 lg:pr-8 lg:pl-8 first:lg:pl-0 border-b border-neutral-200 lg:border-b-0 lg:border-l lg:first:border-l-0"
+                className="py-10 md:py-14 md:pr-10 md:pl-10 first:md:pl-0 last:md:pr-0 border-b border-neutral-200 md:border-b-0 md:border-l md:first:border-l-0"
               >
-                <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 mb-4">
+                <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 mb-5">
                   0{i + 1}
                 </p>
-                <h3 className="text-lg font-semibold tracking-tight leading-snug mb-3">
+                <h3 className="text-lg font-semibold tracking-tight leading-snug uppercase mb-4">
                   {item.title}
                 </h3>
                 <p className="text-sm text-neutral-500 leading-relaxed">
