@@ -521,6 +521,15 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/fun/ab37ae11-8c1c-4bea-920a-86ed2e79172c.png"
+          alt="5 Minute Thank You"
+          className="w-full h-auto block"
+        />
+      </section>
+
       {/* Testimonials */}
       <section className="py-20 px-5 bg-gray-50">
         <div className="max-w-5xl mx-auto">
