@@ -181,12 +181,12 @@ export default function LandingPage() {
         </nav>
       </div>
 
-      {/* Spacer for fixed bar + nav (bar ~40px + nav ~65px) */}
-      <div className="h-[105px]" />
+      {/* Spacer for fixed bar + nav (bar ~40px + logo nav ~96px) */}
+      <div className="h-[148px]" />
 
       {/* Hero — The Thank You Challenge 40 */}
       <section className="bg-[#050505] text-white">
-        <div className="bg-[#D8B15B] text-[#050505] text-center px-4 py-2">
+        <div className="bg-[#FDC92B] text-[#050505] text-center px-4 py-2">
           <p className="text-[11px] font-semibold tracking-[0.2em] uppercase">
             {CHALLENGE.announcement}
           </p>
@@ -205,7 +205,7 @@ export default function LandingPage() {
                 {CHALLENGE.headline[1]}
               </h1>
 
-              <p className="font-serif italic text-3xl sm:text-4xl mt-3 text-[#D8B15B]">
+              <p className="font-serif italic text-3xl sm:text-4xl mt-3 text-[#FDC92B]">
                 {CHALLENGE.accent}
               </p>
 
@@ -254,7 +254,7 @@ export default function LandingPage() {
       {/* What you'll build in 40 days */}
       <section id="what-you-build" className="bg-white px-5 py-20 md:py-24">
         <div className="max-w-6xl mx-auto">
-          <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[#D8B15B] mb-3">
+          <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[#FDC92B] mb-3">
             {CHALLENGE.buildEyebrow}
           </p>
           <h2 className="font-condensed text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-tight">
