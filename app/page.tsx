@@ -24,6 +24,7 @@ import {
   AMAZON_LOGO_URL,
   BOOK_AMAZON_URL,
   MEMBERSHIP_PRICE,
+  MEMBERSHIP_PRICE_WAS,
   MEMBERSHIP_FEATURES,
   NEXT_ZOOM_CALL_DATE,
   NEXT_ZOOM_CALL_TITLE,
@@ -186,7 +187,7 @@ export default function LandingPage() {
 
       {/* Hero — The Thank You Challenge 40 */}
       <section className="bg-[#050505] text-white">
-        <div className="bg-[#FDC92B] text-[#050505] text-center px-4 py-2">
+        <div className="bg-[#FFF200] text-[#050505] text-center px-4 py-2">
           <p className="text-[11px] font-semibold tracking-[0.2em] uppercase">
             {CHALLENGE.announcement}
           </p>
@@ -205,7 +206,7 @@ export default function LandingPage() {
                 {CHALLENGE.headline[1]}
               </h1>
 
-              <p className="font-serif italic text-3xl sm:text-4xl mt-3 text-[#FDC92B]">
+              <p className="font-serif italic text-3xl sm:text-4xl mt-3 text-[#FFF200]">
                 {CHALLENGE.accent}
               </p>
 
@@ -254,7 +255,7 @@ export default function LandingPage() {
       {/* What you'll build in 40 days */}
       <section id="what-you-build" className="bg-white px-5 py-20 md:py-24">
         <div className="max-w-6xl mx-auto">
-          <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[#FDC92B] mb-3">
+          <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[#FFF200] mb-3">
             {CHALLENGE.buildEyebrow}
           </p>
           <h2 className="font-condensed text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-tight">
@@ -428,7 +429,7 @@ export default function LandingPage() {
             <div className="p-4 bg-black text-white rounded-xl text-center sm:text-left">
               <p className="text-xs font-semibold tracking-wider uppercase text-white/40 mb-1">Membership</p>
               <div className="mb-1 flex items-baseline justify-center sm:justify-start gap-1.5">
-                <span className="text-xs text-white/30 line-through">$299</span>
+                <span className="text-xs text-white/30 line-through">{MEMBERSHIP_PRICE_WAS}</span>
                 <span className="text-xl font-bold">{MEMBERSHIP_PRICE}</span>
               </div>
               <p className="text-xs text-white/60">Live the journey every day.</p>
@@ -443,11 +444,13 @@ export default function LandingPage() {
           <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4">Membership</p>
           <h2 className="text-4xl font-bold tracking-tight mb-2">Thank You. Membership</h2>
           <div className="mt-6 mb-2">
-            <span className="text-lg text-white/35 line-through mr-2">$299/mo</span>
-            <span className="text-5xl font-bold">$99</span><span className="text-2xl text-white/50">/mo</span>
+            <span className="text-lg text-white/35 line-through mr-2">{MEMBERSHIP_PRICE_WAS}</span>
+            <span className="text-5xl font-bold">{MEMBERSHIP_PRICE.replace("/mo", "")}</span><span className="text-2xl text-white/50">/mo</span>
           </div>
           <p className="text-sm font-semibold text-white/70 tracking-wide mb-1">Founding Member Price</p>
-          <p className="text-xs text-white/40 mb-8">Lock in $99/month before we reach 1,000 members.</p>
+          <p className="text-xs text-white/40 mb-8">
+            Lock in {MEMBERSHIP_PRICE} — was {MEMBERSHIP_PRICE_WAS}.
+          </p>
           <ul className="space-y-3 text-left mb-8 max-w-xs mx-auto">
             {MEMBERSHIP_FEATURES.map((f) => (
               <li key={f} className="flex items-center gap-3 text-sm">

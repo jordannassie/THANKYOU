@@ -23,8 +23,8 @@ export const LOGO_WHITE_URL =
 export const BOOKS: SiteBook[] = [
   {
     id: "thank-you",
-    title: "365 Thank You.",
-    subtitle: "365 days of gratitude, faith, and seeing the future you're believing God for.",
+    title: "5 Minute Thank You",
+    subtitle: "A 5-minute daily practice of gratitude, faith, and seeing the future you're believing God for.",
     price: "$20",
     coverUrl: "https://stkjiamytlocpeuhwtek.supabase.co/storage/v1/object/public/STORAGE/images/Thankyou/Thank%20youbook.png",
     amazonUrl: "https://www.amazon.com",
@@ -50,7 +50,8 @@ export const AMAZON_LOGO_URL =
 
 // ─── Membership ───────────────────────────────────────────────────────────────
 
-export const MEMBERSHIP_PRICE = "$99/mo";
+export const MEMBERSHIP_PRICE = "$7/mo";
+export const MEMBERSHIP_PRICE_WAS = "$29/mo";
 export const MEMBERSHIP_FEATURES = [
   "Personal Vision Board",
   "Daily Thank You Streak",

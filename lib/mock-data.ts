@@ -8,7 +8,7 @@ export const mockUser = {
 
 export const mockMembership = {
   plan: "Premium",
-  price: "$99/mo",
+  price: "$7/mo",
   status: "active",
   nextBillingDate: "September 15, 2026",
   features: [
